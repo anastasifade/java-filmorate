@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
@@ -9,11 +10,10 @@ import ru.yandex.practicum.filmorate.exceptions.MalformedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
@@ -25,76 +25,91 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
+        log.info("Handling /GET films.");
         return List.copyOf(films.values());
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody CreateFilmDto filmDto) {
-        validateReleaseDate(filmDto.getReleaseDate());
-        validateDuration(filmDto.getDuration());
-        validateDescription(filmDto.getDescription());
+        log.info("Handling POST /films request.");
+        log.debug("POST request to create object: {}.", filmDto);
+        String title = filmDto.getTitle().trim();
+        String description = filmDto.getDescription();
+        LocalDate releaseDate = filmDto.getReleaseDate();
+        int duration = filmDto.getDuration();
 
-        Optional<Long> existingId = findExistingId(filmDto.getTitle(), filmDto.getReleaseDate(), filmDto.getDuration());
+        validateReleaseDate(releaseDate);
+        validateDuration(duration);
+        if (filmDto.getDescription() != null) {
+            description = description.trim();
+            validateDescription(description);
+        }
+
+        Optional<Long> existingId = findExistingId(title, releaseDate, duration);
         if (existingId.isPresent()) {
+            log.info("POST /films request failed: film already exists, id {}.", existingId.get());
             throw new DuplicateDataException(String.format("Film already exists, id [%s].", existingId.get()));
         }
 
-        Film film = toFilm(filmDto);
+        Film film = Film.builder()
+                .id(getNextId())
+                .title(title)
+                .description(description)
+                .releaseDate(releaseDate)
+                .duration(duration)
+                .build();
+
         films.put(film.getId(), film);
+        log.info("Created object: {}.", film);
         return film;
     }
 
     @PutMapping
     public Film update(@RequestBody UpdateFilmDto filmDto) {
-        if (filmDto.getId() < 0) {
-            throw new MalformedDataException("Invalid id - id must be greater than 0.");
-        }
+        log.info("Handling PUT /films request.");
+        log.debug("PUT /films request for: {}.", filmDto);
 
         if (!films.containsKey(filmDto.getId())) {
+            log.info("Film with id={} not found.", filmDto.getId());
             throw new NotFoundException(String.format("Film with id [%s] not found.", filmDto.getId()));
         }
 
         Film film = films.get(filmDto.getId());
 
         if (filmDto.getTitle() != null && !filmDto.getTitle().isBlank()) {
-            film.setTitle(filmDto.getTitle());
+            film.setTitle(filmDto.getTitle().trim());
+            log.debug("Updated field [title] to: {}.", film.getTitle());
         }
 
         if (filmDto.getReleaseDate() != null) {
             validateReleaseDate(filmDto.getReleaseDate());
             film.setReleaseDate(filmDto.getReleaseDate());
+            log.debug("Updated field [release date] to: {}.", film.getReleaseDate());
         }
 
         if (filmDto.getDuration() != null) {
             validateDuration(filmDto.getDuration());
             film.setDuration(filmDto.getDuration());
+            log.debug("Updated field [duration] to: {}.", film.getDuration());
         }
 
         if (filmDto.getDescription() != null) {
-            validateDescription(filmDto.getDescription());
-            film.setDescription(filmDto.getDescription());
+            String description = film.getDescription().trim();
+            validateDescription(description);
+            film.setDescription(description);
+            log.debug("Updated field [description] to: {}.", film.getDescription());
         }
 
         return film;
     }
 
-    private long getNextId() {
-        long currentMaxId = films.keySet()
+    private Long getNextId() {
+        Long currentMaxId = films.keySet()
                 .stream()
                 .mapToLong(id -> id)
                 .max()
                 .orElse(0);
         return ++currentMaxId;
-    }
-
-    private Film toFilm(CreateFilmDto dto) {
-        return Film.builder()
-                .id(getNextId())
-                .title(dto.getTitle())
-                .releaseDate(dto.getReleaseDate())
-                .duration(dto.getDuration())
-                .description(dto.getDescription())
-                .build();
     }
 
 
@@ -104,29 +119,32 @@ public class FilmController {
 
     private void validateReleaseDate(LocalDate release) {
         if (release.isBefore(MIN_RELEASE_DATE)) {
+            log.info("Request failed: invalid release date.");
             throw new MalformedDataException(String.format("Release date cannot be before %s.",
-                    MIN_RELEASE_DATE.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
+                    MIN_RELEASE_DATE));
         }
     }
 
-    private void validateDuration(Duration duration) {
-        if(!duration.isPositive()) {
+    private void validateDuration(Integer duration) {
+        if (duration <= 0) {
+            log.info("Request failed: invalid duration.");
             throw new MalformedDataException("Film duration must be greater than 0.");
         }
     }
 
     private void validateDescription(String description) {
         if (description.length() > MAX_DESCRIPTION_LENGTH) {
+            log.info("Request failed: exceeded max description length.");
             throw new MalformedDataException("Description cannot be longer than 200 characters.");
         }
     }
 
-    private Optional<Long> findExistingId(String title, LocalDate releaseDate, Duration duration) {
+    private Optional<Long> findExistingId(String title, LocalDate releaseDate, int duration) {
         return films.values()
                     .stream()
-                    .filter(film -> film.getTitle().equals(title) &&
+                    .filter(film -> film.getTitle().equalsIgnoreCase(title) &&
                             film.getReleaseDate().equals(releaseDate) &&
-                            film.getDuration().equals(duration))
+                            film.getDuration() == duration)
                     .map(Film::getId)
                     .findFirst();
     }

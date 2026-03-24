@@ -2,18 +2,17 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(of = {"name", "releaseDate", "duration"})
+@EqualsAndHashCode(of = {"id"})
 @Builder
 public class Film {
 
-    private final Long id;
+    private Long id;
     private String title;
     private LocalDate releaseDate;
-    private Duration duration;
+    private int duration;
     private String description;
 
 }

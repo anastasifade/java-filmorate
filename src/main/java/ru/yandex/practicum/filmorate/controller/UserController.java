@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
@@ -15,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -23,6 +25,7 @@ public class UserController {
 
     @GetMapping
     public Collection<ResponseUserDto> findAll() {
+        log.info("Handling GET /users request.");
         return users.values()
                 .stream()
                 .map(user -> toResponseDto(user))
@@ -31,6 +34,8 @@ public class UserController {
 
     @PostMapping
     public ResponseUserDto create(@Valid @RequestBody CreateUserDto userDto) {
+        log.info("Handling POST /users request.");
+        log.debug("POST request to create object: {}.", userDto);
         String login = userDto.getLogin().trim().toLowerCase();
         String email = userDto.getEmail().trim().toLowerCase();
         String name = (userDto.getName() == null || userDto.getName().isBlank()) ? login : userDto.getName().trim();
@@ -51,13 +56,17 @@ public class UserController {
                 .build();
 
         users.put(user.getId(), user);
+        log.info("Created object: {}.", user);
         return toResponseDto(user);
     }
 
     @PutMapping
     public ResponseUserDto update(@Valid @RequestBody UpdateUserDto userDto) {
+        log.info("Handling PUT /users request.");
+        log.debug("PUT /users request for: {}.", userDto);
 
         if (!users.containsKey(userDto.getId())) {
+            log.info("User with id={} not found.", userDto.getId());
             throw new NotFoundException(String.format("User with id [%s] not found.", userDto.getId()));
         }
 
@@ -67,16 +76,19 @@ public class UserController {
             String email = userDto.getEmail().trim().toLowerCase();
             validateEmail(email);
             user.setEmail(email);
+            log.debug("Updated field [email]: {}.", email);
         }
 
         if (userDto.getName() != null && !userDto.getName().isBlank()) {
             user.setName(userDto.getName().trim());
+            log.debug("Updated field [name]: {}.", user.getName());
         }
 
         if (userDto.getBirthday() != null) {
             LocalDate birthday = userDto.getBirthday();
             validateBirthday(birthday);
             user.setBirthday(birthday);
+            log.debug("Updated field [birthday]: {}.", birthday);
         }
 
         return toResponseDto(user);
@@ -108,6 +120,7 @@ public class UserController {
     private void validateLogin(String login) {
         boolean isUnique = users.values().stream().noneMatch(user -> user.getLogin().equals(login));
         if (!isUnique) {
+            log.info("Request failed: login already occupied.");
             throw new DuplicateDataException("Login already taken.");
         }
     }
@@ -115,12 +128,14 @@ public class UserController {
     private void validateEmail(String email) {
         boolean isUnique = users.values().stream().noneMatch(user -> user.getEmail().equals(email));
         if (!isUnique) {
+            log.info("Request failed: email already occupied.");
             throw new DuplicateDataException("Email already taken.");
         }
     }
 
     private void validateBirthday(LocalDate birthday) {
         if (birthday.isAfter(LocalDate.now())) {
+            log.info("Request failed: invalid date of birth.");
             throw new MalformedDataException("Date of birth cannot be in the future.");
         }
     }
