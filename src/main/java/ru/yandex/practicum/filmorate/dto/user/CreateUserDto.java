@@ -10,7 +10,6 @@ import lombok.Value;
 import java.time.LocalDate;
 
 @Value
-@Builder
 public class CreateUserDto {
 
     @Email

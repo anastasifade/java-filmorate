@@ -36,7 +36,7 @@ public class FilmController {
 
         int duration = filmDto.getDuration();
         LocalDate releaseDate = filmDto.getReleaseDate();
-        String title = filmDto.getTitle().trim();
+        String title = filmDto.getName().trim();
         String description = filmDto.getDescription();
         if (filmDto.getDescription() != null) {
             description = description.trim();
@@ -51,7 +51,7 @@ public class FilmController {
 
         Film film = Film.builder()
                 .id(getNextId())
-                .title(title)
+                .name(title)
                 .description(description)
                 .releaseDate(releaseDate)
                 .duration(duration)
@@ -74,9 +74,9 @@ public class FilmController {
 
         Film film = films.get(filmDto.getId());
 
-        if (filmDto.getTitle() != null && !filmDto.getTitle().isBlank()) {
-            film.setTitle(filmDto.getTitle().trim());
-            log.debug("Updated field [title] to: {}.", film.getTitle());
+        if (filmDto.getName() != null && !filmDto.getName().isBlank()) {
+            film.setName(filmDto.getName().trim());
+            log.debug("Updated field [title] to: {}.", film.getName());
         }
 
         if (filmDto.getReleaseDate() != null) {
@@ -124,7 +124,7 @@ public class FilmController {
     private Optional<Long> findExistingId(String title, LocalDate releaseDate, int duration) {
         return films.values()
                     .stream()
-                    .filter(film -> film.getTitle().equalsIgnoreCase(title) &&
+                    .filter(film -> film.getName().equalsIgnoreCase(title) &&
                             film.getReleaseDate().equals(releaseDate) &&
                             film.getDuration() == duration)
                     .map(Film::getId)

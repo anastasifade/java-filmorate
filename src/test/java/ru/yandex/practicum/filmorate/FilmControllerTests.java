@@ -35,16 +35,8 @@ public class FilmControllerTests {
 
     @Test
     void getFilms_ReturnsListOfFilms() {
-        CreateFilmDto film1 = CreateFilmDto.builder()
-                .title("title")
-                .releaseDate(VALID_RELEASE_DATE)
-                .duration(100)
-                .build();
-        CreateFilmDto film2 = CreateFilmDto.builder()
-                .title("other title")
-                .releaseDate(VALID_RELEASE_DATE)
-                .duration(50)
-                .build();
+        CreateFilmDto film1 = new CreateFilmDto("title", VALID_RELEASE_DATE, 100, "description");
+        CreateFilmDto film2 = new CreateFilmDto("other title", VALID_RELEASE_DATE, 100, "description");
         List<Film> expected = List.of(controller.create(film1), controller.create(film2));
 
         Assertions.assertEquals(expected, controller.findAll());
@@ -52,54 +44,44 @@ public class FilmControllerTests {
 
     @Test
     void returnsFilmWithId_PostRequest() {
-        CreateFilmDto filmDto = CreateFilmDto.builder()
-                .title("title")
-                .releaseDate(VALID_RELEASE_DATE)
-                .duration(100)
-                .build();
+        CreateFilmDto filmDto = new CreateFilmDto("title", VALID_RELEASE_DATE, 100, "description");
         Film film = controller.create(filmDto);
         Assertions.assertNotNull(film.getId());
     }
 
     @Test
     void postRequest_failsWithDuplicateData() {
-        CreateFilmDto filmDto = CreateFilmDto.builder()
-                .title("title")
-                .releaseDate(VALID_RELEASE_DATE)
-                .duration(100)
-                .build();
+        CreateFilmDto filmDto = new CreateFilmDto("title", VALID_RELEASE_DATE, 100, "description");
         controller.create(filmDto);
         Assertions.assertThrows(DuplicateDataException.class, () -> controller.create(filmDto));
     }
 
     @Test
     void postRequest_failsWithInvalidReleaseDate() {
-        CreateFilmDto filmDto = CreateFilmDto.builder()
-                .title("title")
-                .releaseDate(INVALID_RELEASE_DATE)
-                .duration(100)
-                .build();
+        CreateFilmDto filmDto = new CreateFilmDto("title", INVALID_RELEASE_DATE, 100, "description");
         Assertions.assertThrows(MalformedDataException.class, () -> controller.create(filmDto));
     }
 
     @Test
     void putRequest_updatesField() {
-        CreateFilmDto filmDto = CreateFilmDto.builder()
-                .title("title")
-                .releaseDate(VALID_RELEASE_DATE)
-                .duration(100)
-                .build();
+        CreateFilmDto filmDto = new CreateFilmDto("title", VALID_RELEASE_DATE, 100, "description");
         Film film = controller.create(filmDto);
-        String expectedTitle = "new title";
-        UpdateFilmDto updateFilmDto = UpdateFilmDto.builder().id(film.getId()).title(expectedTitle).build();
-        Film updatedFilm = controller.update(updateFilmDto);
 
-        Assertions.assertEquals(expectedTitle, updatedFilm.getTitle());
+        String expectedTitle = "new title";
+
+        UpdateFilmDto updateFilmDto = new UpdateFilmDto();
+        updateFilmDto.setId(film.getId());
+        updateFilmDto.setName(expectedTitle);
+
+        Film updatedFilm = controller.update(updateFilmDto);
+        Assertions.assertEquals(expectedTitle, updatedFilm.getName());
     }
 
     @Test
     void putRequest_failsForUnusedId() {
-        UpdateFilmDto updateFilmDto = UpdateFilmDto.builder().id(700L).title("title").build();
+        UpdateFilmDto updateFilmDto = new UpdateFilmDto();
+        updateFilmDto.setId(10000L);
+        updateFilmDto.setName("title");
         Assertions.assertThrows(NotFoundException.class, () -> controller.update(updateFilmDto));
     }
 }

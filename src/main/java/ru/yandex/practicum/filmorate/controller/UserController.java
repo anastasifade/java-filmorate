@@ -36,8 +36,8 @@ public class UserController {
     public ResponseUserDto create(@Valid @RequestBody CreateUserDto userDto) {
         log.info("Handling POST /users request.");
         log.debug("POST request to create object: {}.", userDto);
-        String login = userDto.getLogin().trim().toLowerCase();
-        String email = userDto.getEmail().trim().toLowerCase();
+        String login = userDto.getLogin().trim();
+        String email = userDto.getEmail().trim();
         String name = (userDto.getName() == null || userDto.getName().isBlank()) ? login : userDto.getName().trim();
         LocalDate birthday = userDto.getBirthday();
 
@@ -73,10 +73,16 @@ public class UserController {
         User user = users.get(userDto.getId());
 
         if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            String email = userDto.getEmail().trim().toLowerCase();
+            String email = userDto.getEmail().trim();
             validateEmail(email);
             user.setEmail(email);
             log.debug("Updated field [email]: {}.", email);
+        }
+
+        if (userDto.getLogin() != null && !userDto.getLogin().isBlank()) {
+            String login = userDto.getLogin();
+            validateLogin(login);
+            user.setLogin(login);
         }
 
         if (userDto.getName() != null && !userDto.getName().isBlank()) {
@@ -109,6 +115,8 @@ public class UserController {
                 .id(user.getId())
                 .name(user.getName())
                 .birthday(user.getBirthday())
+                .login(user.getLogin())
+                .email(user.getEmail())
                 .build();
     }
 
@@ -118,7 +126,7 @@ public class UserController {
      */
 
     private void validateLogin(String login) {
-        boolean isUnique = users.values().stream().noneMatch(user -> user.getLogin().equals(login));
+        boolean isUnique = users.values().stream().noneMatch(user -> user.getLogin().equalsIgnoreCase(login));
         if (!isUnique) {
             log.info("Request failed: login already occupied.");
             throw new DuplicateDataException("Login already taken.");
@@ -126,7 +134,7 @@ public class UserController {
     }
 
     private void validateEmail(String email) {
-        boolean isUnique = users.values().stream().noneMatch(user -> user.getEmail().equals(email));
+        boolean isUnique = users.values().stream().noneMatch(user -> user.getEmail().equalsIgnoreCase(email));
         if (!isUnique) {
             log.info("Request failed: email already occupied.");
             throw new DuplicateDataException("Email already taken.");
