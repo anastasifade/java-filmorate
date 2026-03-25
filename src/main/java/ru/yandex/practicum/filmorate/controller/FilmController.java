@@ -19,7 +19,7 @@ import java.util.*;
 public class FilmController {
 
     private static final int MAX_DESCRIPTION_LENGTH = 200;
-    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1985, 12, 28);
+    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -33,18 +33,16 @@ public class FilmController {
     public Film create(@Valid @RequestBody CreateFilmDto filmDto) {
         log.info("Handling POST /films request.");
         log.debug("POST request to create object: {}.", filmDto);
+
+        int duration = filmDto.getDuration();
+        LocalDate releaseDate = filmDto.getReleaseDate();
         String title = filmDto.getTitle().trim();
         String description = filmDto.getDescription();
-        LocalDate releaseDate = filmDto.getReleaseDate();
-        int duration = filmDto.getDuration();
-
-        validateReleaseDate(releaseDate);
-        validateDuration(duration);
         if (filmDto.getDescription() != null) {
             description = description.trim();
-            validateDescription(description);
         }
 
+        validateReleaseDate(releaseDate);
         Optional<Long> existingId = findExistingId(title, releaseDate, duration);
         if (existingId.isPresent()) {
             log.info("POST /films request failed: film already exists, id {}.", existingId.get());
@@ -88,14 +86,12 @@ public class FilmController {
         }
 
         if (filmDto.getDuration() != null) {
-            validateDuration(filmDto.getDuration());
             film.setDuration(filmDto.getDuration());
             log.debug("Updated field [duration] to: {}.", film.getDuration());
         }
 
         if (filmDto.getDescription() != null) {
-            String description = film.getDescription().trim();
-            validateDescription(description);
+            String description = filmDto.getDescription().trim();
             film.setDescription(description);
             log.debug("Updated field [description] to: {}.", film.getDescription());
         }
@@ -122,20 +118,6 @@ public class FilmController {
             log.info("Request failed: invalid release date.");
             throw new MalformedDataException(String.format("Release date cannot be before %s.",
                     MIN_RELEASE_DATE));
-        }
-    }
-
-    private void validateDuration(Integer duration) {
-        if (duration <= 0) {
-            log.info("Request failed: invalid duration.");
-            throw new MalformedDataException("Film duration must be greater than 0.");
-        }
-    }
-
-    private void validateDescription(String description) {
-        if (description.length() > MAX_DESCRIPTION_LENGTH) {
-            log.info("Request failed: exceeded max description length.");
-            throw new MalformedDataException("Description cannot be longer than 200 characters.");
         }
     }
 
