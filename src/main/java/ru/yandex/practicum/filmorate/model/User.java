@@ -7,12 +7,12 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Builder
-public class Film {
+public class User {
 
-    private Long id;
+    private final Long id;
+    private String email;
+    private String login;
     private String name;
-    private LocalDate releaseDate;
-    private int duration;
-    private String description;
+    private LocalDate birthday;
 
 }
