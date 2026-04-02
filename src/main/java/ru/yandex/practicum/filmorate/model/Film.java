@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Builder
-public class Film {
+public class Film implements Entity {
 
     private Long id;
     private String name;

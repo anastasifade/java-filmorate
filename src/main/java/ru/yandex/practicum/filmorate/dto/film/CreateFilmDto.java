@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
+import ru.yandex.practicum.filmorate.validation.film.ReleaseDateConstraint;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,7 @@ public class CreateFilmDto {
     @NotBlank(message = "Missing title.")
     String name;
     @NotNull(message = "Missing release date.")
+    @ReleaseDateConstraint
     LocalDate releaseDate;
     @Positive(message = "Duration must be a positive number.")
     @NotNull(message = "Missing duration.")

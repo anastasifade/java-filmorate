@@ -7,9 +7,9 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Builder
-public class User {
+public class User implements Entity {
 
-    private final Long id;
+    private Long id;
     private String email;
     private String login;
     private String name;
