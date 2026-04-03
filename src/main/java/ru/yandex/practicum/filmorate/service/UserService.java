@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;

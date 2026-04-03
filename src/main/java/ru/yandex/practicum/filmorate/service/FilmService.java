@@ -11,19 +11,27 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
 
+    private static final Comparator<Film> FILM_LIKE_COMPARATOR =
+            (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();
+
     private final FilmStorage filmStorage;
+    private final UserService userService;
 
     public Collection<Film> findAll() {
         log.trace("GET /films request received by FilmService.");
         return filmStorage.findAll();
+    }
+
+    public Collection<Film> findPopular(int count) {
+        log.trace("GET /films/popular?count={} request received by FilmService.", count);
+        return filmStorage.findAll().stream().sorted(FILM_LIKE_COMPARATOR).limit(count).toList();
     }
 
     public Film findById(Long id) {
@@ -58,6 +66,7 @@ public class FilmService {
                 .description(description)
                 .releaseDate(releaseDate)
                 .duration(duration)
+                .likes(new HashSet<>())
                 .build();
 
         film = filmStorage.create(film);
@@ -112,6 +121,44 @@ public class FilmService {
 
         film = filmStorage.update(film);
         return film;
+    }
+
+    public void addLike(Long filmId, Long userId) {
+        Optional<Film> filmOptional = filmStorage.findById(filmId);
+        if (filmOptional.isEmpty()) {
+            throwNotFound(filmId);
+        }
+
+        // throws NotFoundException in userService if user is not found
+        userService.findById(userId);
+
+        Film film = filmOptional.get();
+        if (film.getLikes().contains(userId)) {
+            log.debug("Attempt to add like to film id={} from user id={}: the user has already liked the film in the past." +
+                    "No changes done.", filmId, userId);
+            return;
+        }
+
+        filmStorage.addLike(filmId, userId);
+    }
+
+    public void deleteLike(Long filmId, Long userId) {
+        Optional<Film> filmOptional = filmStorage.findById(filmId);
+        if (filmOptional.isEmpty()) {
+            throwNotFound(filmId);
+        }
+
+        // throws NotFoundException in userService if user is not found
+        userService.findById(userId);
+
+        Film film = filmOptional.get();
+        if (!film.getLikes().contains(userId)) {
+            log.debug("Attempt to delete like from film id={} by user id={}: user has not liked the film in the past." +
+                    "Nothing to delete.", filmId, userId);
+            return;
+        }
+
+        filmStorage.deleteLike(filmId, userId);
     }
 
     private void throwNotFound(long id) {

@@ -4,17 +4,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryStorage;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
 public class InMemoryUserStorage extends InMemoryStorage<User> implements UserStorage {
-
-    @Override
-    public List<User> findAllBy() {
-        return null;
-    }
 
     @Override
     public boolean isLoginOccupied(String login) {

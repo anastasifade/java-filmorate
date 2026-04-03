@@ -5,16 +5,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryStorage;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
-
-    @Override
-    public List<Film> findAllBy() {
-        return null;
-    }
 
     @Override
     public Optional<Film> findBy(String name, LocalDate release, int duration) {
@@ -24,6 +18,16 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
                         film.getReleaseDate().equals(release) &&
                         film.getDuration() == duration)
                 .findFirst();
+    }
+
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        storage.get(filmId).getLikes().add(userId);
+    }
+
+    @Override
+    public void deleteLike(Long filmId, Long userId) {
+        storage.get(filmId).getLikes().remove(userId);
     }
 
 }
