@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"id"})
@@ -14,5 +15,7 @@ public class User implements Entity {
     private String login;
     private String name;
     private LocalDate birthday;
+
+    private Set<Long> friends;
 
 }

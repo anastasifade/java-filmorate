@@ -26,6 +26,12 @@ public class UserController {
         return userService.findAll();
     }
 
+    @GetMapping("/{id}")
+    public ResponseUserDto findById(@PathVariable Long id) {
+        log.info("Handling GET /users/{}.", id);
+        return userService.findById(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseUserDto create(@Valid @RequestBody CreateUserDto dto) {

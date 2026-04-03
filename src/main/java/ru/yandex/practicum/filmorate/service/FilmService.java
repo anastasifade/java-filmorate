@@ -26,6 +26,17 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
+    public Film findById(Long id) {
+        log.trace("GET /films/{} request received by FilmService.", id);
+        Optional<Film> filmOptional = filmStorage.findById(id);
+
+        if (filmOptional.isEmpty()) {
+            throwNotFound(id);
+        }
+
+        return filmOptional.get();
+    }
+
     public Film create(CreateFilmDto dto) {
         log.trace("POST /films request received by FilmService.");
         int duration = dto.getDuration();
@@ -38,7 +49,7 @@ public class FilmService {
 
         Optional<Film> existingFilm = filmStorage.findBy(name, releaseDate, duration);
         if (existingFilm.isPresent()) {
-            log.info("POST /films request failed: film already exists, id {}.", existingFilm.get().getId());
+            log.warn("POST /films request failed: film already exists, id {}.", existingFilm.get().getId());
             throw new DuplicateDataException(String.format("Film already exists, id [%d].", existingFilm.get().getId()));
         }
 
@@ -58,8 +69,7 @@ public class FilmService {
         Optional<Film> filmOptional = filmStorage.findById(dto.getId());
 
         if (filmOptional.isEmpty()) {
-            log.info("Film with id={} not found.", dto.getId());
-            throw new NotFoundException(String.format("Film with id [%d] not found.", dto.getId()));
+            throwNotFound(dto.getId());
         }
 
         Film film = filmOptional.get();
@@ -68,8 +78,8 @@ public class FilmService {
                 dto.getReleaseDate() == null ? film.getReleaseDate() : dto.getReleaseDate(),
                 dto.getDuration() == null ? film.getDuration() : dto.getDuration());
 
-        if (existingFilm.isPresent() && existingFilm.get().getId() != dto.getId()) {
-            log.debug("Update failed: attempted update to an already existing film. Existing film id: {}.",
+        if (existingFilm.isPresent() && !existingFilm.get().getId().equals(dto.getId())) {
+            log.warn("Update failed: attempted update to an already existing film. Existing film id: {}.",
                     existingFilm.get().getId());
             log.trace("Attempted to update film: {}.{}Attempted to update fields to:{}.{}Conflicting film: {}.",
                     film, System.lineSeparator(),
@@ -102,6 +112,11 @@ public class FilmService {
 
         film = filmStorage.update(film);
         return film;
+    }
+
+    private void throwNotFound(long id) {
+        log.warn("Film with id={} not found.", id);
+        throw new NotFoundException(String.format("Film with id [%d] not found.", id));
     }
 
 }
