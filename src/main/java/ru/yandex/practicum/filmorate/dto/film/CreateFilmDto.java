@@ -9,12 +9,14 @@ import ru.yandex.practicum.filmorate.validation.film.ReleaseDateConstraint;
 
 import java.time.LocalDate;
 
+
 @Value
 public class CreateFilmDto {
+
     @NotBlank(message = "Missing title.")
     String name;
     @NotNull(message = "Missing release date.")
-    @ReleaseDateConstraint
+    @ReleaseDateConstraint(message = "Release date cannot be before 1985-12-28.")
     LocalDate releaseDate;
     @Positive(message = "Duration must be a positive number.")
     @NotNull(message = "Missing duration.")

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.validation.film;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ru.yandex.practicum.filmorate.exceptions.MalformedDataException;
 
 import java.time.LocalDate;
 
@@ -21,10 +20,10 @@ public class ReleaseDateValidator implements ConstraintValidator<ReleaseDateCons
         }
 
         if (releaseDate.isBefore(MIN_RELEASE_DATE)) {
-            throw new MalformedDataException(String.format("Release date cannot be before %s.",
-                    MIN_RELEASE_DATE));
+            return false;
         }
 
         return true;
     }
+
 }

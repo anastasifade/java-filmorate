@@ -12,19 +12,19 @@ import java.time.LocalDate;
 public class UpdateUserDto {
 
     @NotNull
-    Long id;
+    private Long id;
 
     @NullOrNotBlank
-    String name;
+    private String name;
 
     @NullOrNotBlank
-    String login;
+    private String login;
 
     @NullOrNotBlank
     @Email
-    String email;
+    private String email;
 
     @PastOrPresent
-    LocalDate birthday;
+    private LocalDate birthday;
 
 }
