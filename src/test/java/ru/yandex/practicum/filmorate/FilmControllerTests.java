@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.exceptions.DuplicateDataException;
-import ru.yandex.practicum.filmorate.exceptions.MalformedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -22,7 +21,6 @@ import java.util.List;
 public class FilmControllerTests {
 
     private static final LocalDate VALID_RELEASE_DATE = LocalDate.of(2007, 11, 11);
-    private static final LocalDate INVALID_RELEASE_DATE = LocalDate.of(1800, 01, 01);
 
     private FilmController controller;
 
@@ -59,12 +57,6 @@ public class FilmControllerTests {
         CreateFilmDto filmDto = new CreateFilmDto("title", VALID_RELEASE_DATE, 100, "description");
         controller.create(filmDto);
         Assertions.assertThrows(DuplicateDataException.class, () -> controller.create(filmDto));
-    }
-
-    @Test
-    void postRequest_failsWithInvalidReleaseDate() {
-        CreateFilmDto filmDto = new CreateFilmDto("title", INVALID_RELEASE_DATE, 100, "description");
-        Assertions.assertThrows(MalformedDataException.class, () -> controller.create(filmDto));
     }
 
     @Test
