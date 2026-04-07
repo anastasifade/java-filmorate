@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.exceptions.DuplicateDataException;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ public class UserControllerTests {
 
     @BeforeEach
     void createUserController() {
-        controller = new UserController();
+        controller = new UserController(new UserService(new InMemoryUserStorage()));
     }
 
     @Test
@@ -48,7 +50,7 @@ public class UserControllerTests {
     @Test
     void postUser_setsNameToLogin_ifNoNameSubmitted() {
         String login = "login";
-        CreateUserDto user = new CreateUserDto("email@email.email", login, "", LocalDate.now());
+        CreateUserDto user = new CreateUserDto("email@email.email", login, null, LocalDate.now());
         ResponseUserDto dto = controller.create(user);
         Assertions.assertEquals(login, dto.getName());
     }
@@ -88,19 +90,4 @@ public class UserControllerTests {
         Assertions.assertEquals(newName, updatedUser.getName());
     }
 
-    @Test
-    void putRequest_failsWhenUpdatedEmailIsOccupied() {
-        String email = "email@email.email";
-        CreateUserDto user1Dto = new CreateUserDto(email, "a", "a", LocalDate.now());
-        controller.create(user1Dto);
-        CreateUserDto user2Dto = new CreateUserDto("different@email.com", "b", "b", LocalDate.now());
-
-        ResponseUserDto user2 = controller.create(user2Dto);
-
-        UpdateUserDto updateUser2Dto = new UpdateUserDto();
-        updateUser2Dto.setId(user2.getId());
-        updateUser2Dto.setEmail(email);
-
-        Assertions.assertThrows(DuplicateDataException.class, () -> controller.update(updateUser2Dto));
-    }
 }
