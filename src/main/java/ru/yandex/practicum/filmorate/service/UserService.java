@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -106,9 +105,6 @@ public class UserService {
         }
 
         return userStorage.getFriends(userId).stream()
-                .map(userStorage::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
                 .map(this::toResponseDto)
                 .toList();
     }
@@ -125,13 +121,8 @@ public class UserService {
             throwNotFound(userId2);
         }
 
-        Set<Long> user1Friends = userStorage.getFriends(userId1);
-        Set<Long> user2Friends = userStorage.getFriends(userId2);
-        return user1Friends.stream()
-                .filter(id -> user2Friends.contains(id))
-                .map(userStorage::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return userStorage.getCommonFriends(userId1, userId2)
+                .stream()
                 .map(this::toResponseDto)
                 .toList();
     }

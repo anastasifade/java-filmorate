@@ -9,13 +9,13 @@ import java.time.LocalDate;
 @Builder
 public class ResponseUserDto {
 
-    Long id;
-    String name;
-    LocalDate birthday;
+    private Long id;
+    private String name;
+    private LocalDate birthday;
 
     // TODO: remove login and email from response user DTO to avoid sharing sensitive information
 
-    String login;
-    String email;
+    private String login;
+    private String email;
 
 }

@@ -14,15 +14,15 @@ public class CreateUserDto {
 
     @NotNull
     @Email
-    String email;
+    private String email;
 
     @NotBlank
-    String login;
+    private String login;
 
     @NullOrNotBlank
-    String name;
+    private String name;
 
     @PastOrPresent
-    LocalDate birthday;
+    private LocalDate birthday;
 
 }

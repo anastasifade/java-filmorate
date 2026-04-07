@@ -14,13 +14,13 @@ import java.time.LocalDate;
 public class CreateFilmDto {
 
     @NotBlank(message = "Missing title.")
-    String name;
+    private String name;
     @NotNull(message = "Missing release date.")
     @ReleaseDateConstraint(message = "Release date cannot be before 1985-12-28.")
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
     @Positive(message = "Duration must be a positive number.")
     @NotNull(message = "Missing duration.")
-    Integer duration;
+    private Integer duration;
     @Length(max = 200, message = "Description length cannot exceed 200 characters.")
-    String description;
+    private String description;
 }

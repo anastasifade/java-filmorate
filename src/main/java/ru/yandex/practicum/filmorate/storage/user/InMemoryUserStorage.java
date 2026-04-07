@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryStorage;
 
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -20,8 +21,25 @@ public class InMemoryUserStorage extends InMemoryStorage<User> implements UserSt
     }
 
     @Override
-    public Set<Long> getFriends(Long userId) {
-        return storage.get(userId).getFriends();
+    public List<User> getFriends(Long userId) {
+        return storage.get(userId)
+                .getFriends()
+                .stream()
+                .filter(id -> storage.containsKey(id))
+                .map(id -> storage.get(id))
+                .toList();
+    }
+
+    @Override
+    public List<User> getCommonFriends(Long firstId, Long secondId) {
+        Set<Long> firstUserFriends = storage.get(firstId).getFriends();
+        return storage.get(secondId)
+                .getFriends()
+                .stream()
+                .filter(id -> firstUserFriends.contains(id) &&
+                        storage.containsKey(id))
+                .map(id -> storage.get(id))
+                .toList();
     }
 
     @Override
