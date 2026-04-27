@@ -11,5 +11,4 @@ public class FilmorateApplication {
 		SpringApplication.run(FilmorateApplication.class, args);
         log.info("Application started.");
 	}
-
 }

@@ -5,18 +5,22 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
+import ru.yandex.practicum.filmorate.validation.film.ReleaseDateConstraint;
 
 import java.time.LocalDate;
 
+
 @Value
 public class CreateFilmDto {
+
     @NotBlank(message = "Missing title.")
-    String name;
+    private String name;
     @NotNull(message = "Missing release date.")
-    LocalDate releaseDate;
+    @ReleaseDateConstraint(message = "Release date cannot be before 1985-12-28.")
+    private LocalDate releaseDate;
     @Positive(message = "Duration must be a positive number.")
     @NotNull(message = "Missing duration.")
-    Integer duration;
+    private Integer duration;
     @Length(max = 200, message = "Description length cannot exceed 200 characters.")
-    String description;
+    private String description;
 }
