@@ -1,14 +1,24 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.dal.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.InMemoryStorage;
+import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
+
+    private static final Comparator<Film> FILM_LIKE_COMPARATOR =
+            (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();
+
+    @Override
+    public Collection<Film> findPopular(int count) {
+        return findAll().stream().sorted(FILM_LIKE_COMPARATOR).limit(count).toList();
+    }
 
     @Override
     public Optional<Film> findBy(String name, LocalDate release, int duration) {

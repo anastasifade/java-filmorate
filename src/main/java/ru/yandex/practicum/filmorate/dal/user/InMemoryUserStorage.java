@@ -1,8 +1,8 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.dal.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryStorage;
+import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
 
 import java.util.List;
 import java.util.Set;
@@ -12,12 +12,16 @@ public class InMemoryUserStorage extends InMemoryStorage<User> implements UserSt
 
     @Override
     public boolean isLoginOccupied(String login) {
-        return storage.values().stream().anyMatch(user -> user.getLogin().equalsIgnoreCase(login));
+        return storage.values()
+                .stream()
+                .anyMatch(user -> user.getLogin().equalsIgnoreCase(login));
     }
 
     @Override
     public boolean isEmailOccupied(String email) {
-        return storage.values().stream().anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
+        return storage.values()
+                .stream()
+                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
     }
 
     @Override
@@ -25,8 +29,8 @@ public class InMemoryUserStorage extends InMemoryStorage<User> implements UserSt
         return storage.get(userId)
                 .getFriends()
                 .stream()
-                .filter(id -> storage.containsKey(id))
-                .map(id -> storage.get(id))
+                .filter(storage::containsKey)
+                .map(storage::get)
                 .toList();
     }
 
@@ -38,19 +42,17 @@ public class InMemoryUserStorage extends InMemoryStorage<User> implements UserSt
                 .stream()
                 .filter(id -> firstUserFriends.contains(id) &&
                         storage.containsKey(id))
-                .map(id -> storage.get(id))
+                .map(storage::get)
                 .toList();
     }
 
     @Override
     public void addFriend(Long userId, Long friendId) {
         storage.get(userId).getFriends().add(friendId);
-        storage.get(friendId).getFriends().add(userId);
     }
 
     @Override
     public void deleteFriend(Long userId, Long friendId) {
         storage.get(userId).getFriends().remove(friendId);
-        storage.get(friendId).getFriends().remove(userId);
     }
 }

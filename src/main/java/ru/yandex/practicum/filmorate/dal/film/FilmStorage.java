@@ -1,14 +1,17 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.dal.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.Storage;
+import ru.yandex.practicum.filmorate.dal.Storage;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface FilmStorage extends Storage<Film> {
 
-    Optional<Film> findBy(String title, LocalDate release, int duration);
+    Collection<Film> findPopular(int count);
+
+    Optional<Film> findBy(String name, LocalDate releaseDate, int duration);
 
     void addLike(Long filmId, Long userId);
 
