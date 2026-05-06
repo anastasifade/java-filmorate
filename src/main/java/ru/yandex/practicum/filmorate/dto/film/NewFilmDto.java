@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
-import ru.yandex.practicum.filmorate.dto.Id;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.validation.film.ReleaseDateConstraint;
 
 import java.time.LocalDate;
@@ -26,9 +27,9 @@ public class NewFilmDto {
     @Length(max = 200, message = "Description length cannot exceed 200 characters.")
     private String description;
     @NotNull
-    private Id mpa;
+    private MPA mpa;
 
-    private Set<Id> genres;
+    private Set<Genre> genres;
 
 
 }

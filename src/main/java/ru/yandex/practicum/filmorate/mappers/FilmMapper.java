@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
@@ -10,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Component
@@ -26,7 +24,7 @@ public final class FilmMapper {
             description = description.trim();
         }
 
-        Set<Genre> genres = dto.getGenres() == null ? null : toGenres(dto.getGenres());
+        Set<Genre> genres = dto.getGenres() == null ? null : dto.getGenres();
 
         return Film.builder()
                 .name(name)
@@ -45,7 +43,7 @@ public final class FilmMapper {
         int duration = (dto.getDuration() == null) ? film.getDuration() : dto.getDuration();
         MPA mpa = (dto.getMpa() == null) ? film.getMpa() : new MPA(dto.getMpa().getId(), null);
         Set<Genre> genres = (dto.getGenres() == null || dto.getGenres().isEmpty()) ?
-                film.getGenres() : toGenres(dto.getGenres());
+                film.getGenres() : dto.getGenres();
 
         return Film.builder()
                 .id(dto.getId())
@@ -68,12 +66,6 @@ public final class FilmMapper {
                 .mpa(film.getMpa())
                 .genres(film.getGenres())
                 .build();
-    }
-
-    private static Set<Genre> toGenres(Set<Id> ids) {
-        Set<Genre> genres = new HashSet<>();
-        ids.forEach(id -> genres.add(new Genre(id.getId(), null)));
-        return genres;
     }
 
 }

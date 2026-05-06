@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
@@ -11,6 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.*;
 
@@ -119,9 +119,9 @@ public class FilmService {
         mpaService.findById(id);
     }
 
-    private void validateGenres(Set<Id> ids) {
-        ids.stream()
-                .map(id -> id.getId())
+    private void validateGenres(Set<Genre> genres) {
+        genres.stream()
+                .map(g -> g.getId())
                 .forEach(genreService::findById);
     }
 
