@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,8 @@ import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -140,11 +143,13 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         this.extractor = extractor;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Collection<Film> findAll() {
         return findMany(FIND_ALL, extractor);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Film> findById(long id) {
         try {
@@ -155,6 +160,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Film> findBy(String name, LocalDate releaseDate, int duration) {
         try {
@@ -166,6 +172,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Collection<Film> findPopular(int count) {
         return findMany(FIND_POPULAR, extractor, count);
@@ -182,7 +189,12 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                 obj.getMpa().getId());
 
         if (obj.getGenres() != null) {
-            obj.getGenres().forEach(genre -> update(INSERT_FILMS_GENRES, id, genre.getId()));
+            int[] rows = batchUpdate(INSERT_FILMS_GENRES,
+                    getBatchPsSetterForFilmsGenres(id, obj.getGenres().stream().toList()));
+            if (rows.length != obj.getGenres().size()) {
+                log.debug("Failed to insert genres when creating film: {}.", obj);
+                throw new InternalServerException("Failed to add genres when creating film.");
+            }
         }
 
         Optional<Film> film = findById(id);
@@ -204,8 +216,10 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
 
         if (obj.getGenres() != null) {
             delete(DELETE_FILMS_GENRES, id);
-            for (Genre genre : obj.getGenres()) {
-                update(INSERT_FILMS_GENRES, id, genre.getId());
+            int[] rows = batchUpdate(INSERT_FILMS_GENRES, getBatchPsSetterForFilmsGenres(id, obj.getGenres().stream().toList()));
+            if (rows.length != obj.getGenres().size()) {
+                log.debug("Failed to insert new genres:[{}] when updating film: {}.", obj.getGenres(), obj);
+                throw new InternalServerException("Failed to update genres when updating film.");
             }
         }
 
@@ -213,11 +227,13 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         return film.orElseThrow(() -> new InternalServerException("Failed to update film."));
     }
 
+    @Transactional
     @Override
     public void addLike(Long filmId, Long userId) {
         update(INSERT_FILMS_LIKES, filmId, userId);
     }
 
+    @Transactional
     @Override
     public void deleteLike(Long filmId, Long userId) {
         try {
@@ -227,5 +243,19 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         }
     }
 
+    private BatchPreparedStatementSetter getBatchPsSetterForFilmsGenres(Long filmId, List<Genre> genres) {
+        return new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, filmId);
+                ps.setLong(2, genres.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genres.size();
+            }
+        };
+    }
 
 }

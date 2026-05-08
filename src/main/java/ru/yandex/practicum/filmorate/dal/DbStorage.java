@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dal;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -31,19 +32,23 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
         this.mapper = mapper;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Collection<T> findAll() {
         return jdbc.query(getFindAllQuery(), mapper);
     }
 
+    @Transactional(readOnly = true)
     protected Collection<T> findMany(String query, Object... params) {
         return jdbc.query(query, mapper, params);
     }
 
+    @Transactional(readOnly = true)
     protected Collection<T> findMany(String query, ResultSetExtractor<List<T>> extractor, Object... params) {
         return jdbc.query(query, extractor, params);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<T> findById(long id) {
         try {
@@ -54,6 +59,7 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
         }
     }
 
+    @Transactional(readOnly = true)
     public Optional<T> findOne(String query, Object... params) {
         try {
             T result = jdbc.queryForObject(query, mapper, params);
@@ -99,6 +105,11 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
         if (rowsUpdated == 0) {
             throw new InternalServerException("Failed to update data.");
         }
+    }
+
+    @Transactional
+    protected int[] batchUpdate(String query, BatchPreparedStatementSetter setter) {
+        return jdbc.batchUpdate(query, setter);
     }
 
     @Transactional

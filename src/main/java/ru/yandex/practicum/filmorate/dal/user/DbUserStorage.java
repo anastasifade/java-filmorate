@@ -106,31 +106,37 @@ public class DbUserStorage extends DbStorage<User> implements UserStorage {
                 new InternalServerException("Failed to update user information."));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean isLoginOccupied(String login) {
         return findOne(FIND_LOGIN, login).isPresent();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean isEmailOccupied(String email) {
         return findOne(FIND_EMAIL, email).isPresent();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Collection<User> getFriends(Long userId) {
         return findMany(FIND_FRIENDS, userId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Collection<User> getCommonFriends(Long user1, Long user2) {
         return findMany(FIND_COMMON_FRIENDS, user1, user2);
     }
 
+    @Transactional
     @Override
     public void addFriend(Long userId, Long friendId) {
         update(ADD_FRIEND, userId, friendId);
     }
 
+    @Transactional
     @Override
     public void deleteFriend(Long userId, Long friendId) {
         try {
