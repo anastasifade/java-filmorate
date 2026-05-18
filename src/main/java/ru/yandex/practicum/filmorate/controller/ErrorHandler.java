@@ -50,7 +50,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(final Throwable e) {
         log.error("Internal server error: {}.", e.getMessage());
-        log.debug("Error details: {}.", e.getStackTrace());
+        log.debug("Error details: {}.", e.getStackTrace().toString());
         return new ErrorResponse(String.format("Unexpected error: %s.", e.getMessage()));
     }
 }

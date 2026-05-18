@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.*;
@@ -21,39 +21,39 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> findAll() {
+    public Collection<ResponseFilmDto> findAll() {
         log.info("Handling GET /films.");
         return filmService.findAll();
     }
 
     @GetMapping("/popular")
-    public Collection<Film> findPopular(@RequestParam(defaultValue = "10") int count) {
+    public Collection<ResponseFilmDto> findPopular(@RequestParam(defaultValue = "10") int count) {
         log.info("Handling GET /films/popular?count={}.", count);
         return filmService.findPopular(count);
     }
 
     @GetMapping("/{id}")
-    public Film findById(@PathVariable Long id) {
+    public ResponseFilmDto findById(@PathVariable Long id) {
         log.info("Handling GET /films/{}.", id);
         return filmService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@Valid @RequestBody CreateFilmDto dto) {
+    public ResponseFilmDto create(@Valid @RequestBody NewFilmDto dto) {
         log.info("Handling POST /films request.");
         log.debug("POST request to create object: {}.", dto);
-        Film film = filmService.create(dto);
+        ResponseFilmDto film = filmService.create(dto);
         log.info("Created object: {}.", film);
         return film;
     }
 
     @PutMapping
-    public Film update(@RequestBody UpdateFilmDto dto) {
+    public ResponseFilmDto update(@RequestBody UpdateFilmDto dto) {
         log.info("Handling PUT /films request.");
         log.debug("PUT /films request for: {}.", dto);
 
-        Film film = filmService.update(dto);
+        ResponseFilmDto film = filmService.update(dto);
         log.debug("Updated object: {}.", film);
         return film;
     }

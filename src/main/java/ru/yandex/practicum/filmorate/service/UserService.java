@@ -3,16 +3,16 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.NewUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.exceptions.DuplicateDataException;
+import ru.yandex.practicum.filmorate.exceptions.MalformedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.dal.user.UserStorage;
 
-import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ public class UserService {
 
     public List<ResponseUserDto> findAll() {
         log.trace("GET /users request received by UserService.");
-        return userStorage.findAll().stream().map(this::toResponseDto).toList();
+        return userStorage.findAll().stream().map(UserMapper::toDto).toList();
     }
 
     public ResponseUserDto findById(Long id) {
@@ -34,32 +34,25 @@ public class UserService {
         if (userOptional.isEmpty()) {
             throwNotFound(id);
         }
-        return toResponseDto(userOptional.get());
+        return UserMapper.toDto(userOptional.get());
     }
 
-    public ResponseUserDto create(CreateUserDto dto) {
+    public ResponseUserDto create(NewUserDto dto) {
         log.trace("POST /users request received by UserService.");
+
         String login = dto.getLogin().trim();
-        String email = dto.getEmail().trim();
-        String name = (dto.getName() == null) ? login : dto.getName().trim();
-        LocalDate birthday = dto.getBirthday();
-
-        validateLogin(login);
-        validateEmail(email);
-
-        User user = User.builder()
-                .login(login)
-                .email(email)
-                .name(name)
-                .friends(new HashSet<>())
-                .build();
-
-        if (birthday != null) {
-            user.setBirthday(birthday);
+        if (userStorage.isLoginOccupied(login)) {
+            throwDuplicateLogin(dto.getLogin());
         }
 
+        String email = dto.getEmail().trim();
+        if (userStorage.isEmailOccupied(email)) {
+            throwDuplicateEmail(email);
+        }
+
+        User user = UserMapper.toUser(dto);
         user = userStorage.create(user);
-        return toResponseDto(user);
+        return UserMapper.toDto(user);
     }
 
     public ResponseUserDto update(UpdateUserDto dto) {
@@ -71,30 +64,19 @@ public class UserService {
 
         User user = userOptional.get();
 
-        if (dto.getEmail() != null && !dto.getEmail().equalsIgnoreCase(user.getEmail())) {
-            String email = dto.getEmail().trim();
-            user.setEmail(email);
+        String newLogin = dto.getLogin() == null ? user.getLogin() : dto.getLogin().trim();
+        if (!newLogin.equalsIgnoreCase(user.getLogin()) && userStorage.isLoginOccupied(newLogin)) {
+            throwDuplicateLogin(newLogin);
         }
 
-        if (dto.getLogin() != null && !dto.getLogin().equalsIgnoreCase(user.getLogin())) {
-            String login = dto.getLogin().trim();
-            validateLogin(login);
-            user.setLogin(login);
+        String newEmail = dto.getEmail() == null ? user.getEmail() : dto.getEmail().trim();
+        if (!newEmail.equalsIgnoreCase(user.getEmail()) && userStorage.isEmailOccupied(newEmail)) {
+            throwDuplicateEmail(newEmail);
         }
 
-        if (dto.getName() != null) {
-            user.setName(dto.getName().trim());
-            log.debug("Updated field [name]: {}.", user.getName());
-        }
-
-        if (dto.getBirthday() != null) {
-            LocalDate birthday = dto.getBirthday();
-            user.setBirthday(birthday);
-            log.debug("Updated field [birthday]: {}.", birthday);
-        }
-
+        user = UserMapper.toUser(dto, user);
         user = userStorage.update(user);
-        return toResponseDto(user);
+        return UserMapper.toDto(user);
     }
 
     public List<ResponseUserDto> getFriends(Long userId) {
@@ -105,12 +87,13 @@ public class UserService {
         }
 
         return userStorage.getFriends(userId).stream()
-                .map(this::toResponseDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
     public List<ResponseUserDto> getCommonFriends(Long userId1, Long userId2) {
         log.trace("GET /users/{}/friends/common/{} request received by UserService.", userId1, userId2);
+
         Optional<User> user1Opt = userStorage.findById(userId1);
         if (user1Opt.isEmpty()) {
             throwNotFound(userId1);
@@ -123,12 +106,18 @@ public class UserService {
 
         return userStorage.getCommonFriends(userId1, userId2)
                 .stream()
-                .map(this::toResponseDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
     public void addFriend(Long userId, Long friendId) {
         log.trace("PUT /users/{}/friends/{} request received by UserService.", userId, friendId);
+
+        if (userId.equals(friendId)) {
+            log.debug("Friend not added. UserId={} = friendId={}.", userId, friendId);
+            throw new MalformedDataException("Cannot add user to their own friends list.");
+        }
+
         Optional<User> userOptional = userStorage.findById(userId);
         if (userOptional.isEmpty()) {
             throwNotFound(userId);
@@ -137,13 +126,6 @@ public class UserService {
         Optional<User> friendOptional = userStorage.findById(friendId);
         if (friendOptional.isEmpty()) {
             throwNotFound(friendId);
-        }
-
-        User user = userOptional.get();
-        if (user.getFriends().contains(friendId)) {
-            log.debug("Attempt to add user id={} to friends by user id={}: users are already friends. No changes done.",
-                    friendId, userId);
-            return;
         }
 
         userStorage.addFriend(userId, friendId);
@@ -161,44 +143,22 @@ public class UserService {
             throwNotFound(friendId);
         }
 
-        User user = userOptional.get();
-        if (!user.getFriends().contains(friendId)) {
-            log.debug("Attempt to delete user id={} from friends by user id={}: user not found in friends list. " +
-                            "No changes done.",
-                    friendId, userId);
-            return;
-        }
-
         userStorage.deleteFriend(userId, friendId);
-    }
-
-    private void validateLogin(String login) {
-        if (userStorage.isLoginOccupied(login)) {
-            log.warn("Request failed: login already occupied.");
-            throw new DuplicateDataException("Login already occupied.");
-        }
-    }
-
-    private void validateEmail(String email) {
-        if (userStorage.isEmailOccupied(email)) {
-            log.warn("Request failed: email already occupied.");
-            throw new DuplicateDataException("Email already taken.");
-        }
-    }
-
-    private ResponseUserDto toResponseDto(User user) {
-        return ResponseUserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .birthday(user.getBirthday())
-                .login(user.getLogin())
-                .email(user.getEmail())
-                .build();
     }
 
     private void throwNotFound(Long id) {
         log.warn("User with id={} not found.", id);
         throw new NotFoundException(String.format("User with id [%d] not found.", id));
+    }
+
+    private void throwDuplicateLogin(String login) {
+        log.warn("Request failed: login={} already occupied.", login);
+        throw new DuplicateDataException(String.format("Login [%s] already occupied.", login));
+    }
+
+    private void throwDuplicateEmail(String email) {
+        log.warn("Request failed: email={} already occupied.", email);
+        throw new DuplicateDataException(String.format("Email [%s] already taken.", email));
     }
 
 }

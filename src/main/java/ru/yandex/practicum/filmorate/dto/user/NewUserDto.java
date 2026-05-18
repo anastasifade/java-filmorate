@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.validation.NullOrNotBlank;
 import java.time.LocalDate;
 
 @Value
-public class CreateUserDto {
+public class NewUserDto {
 
     @NotNull
     @Email
