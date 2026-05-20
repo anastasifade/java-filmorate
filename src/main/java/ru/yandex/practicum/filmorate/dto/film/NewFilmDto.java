@@ -29,6 +29,6 @@ public class NewFilmDto {
     private Id mpa;
 
     private Set<Id> genres;
-
+    private Set<Id> directors;
 
 }

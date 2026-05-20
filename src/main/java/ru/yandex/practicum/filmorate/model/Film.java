@@ -16,10 +16,10 @@ public class Film implements Entity {
     private int duration;
     private String description;
 
+    private Set<Director> directors;
     private Set<Genre> genres;
     private MPA mpa;
 
-    // TODO: remove field? must find a workaround for in-memory storage
     private Set<Long> likes;
 
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exceptions.FailedToDeleteException;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -36,12 +37,16 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                    f.mpa_id AS mpa_id,
                    m.name AS mpa_name,
                    g.id AS genre_id,
-                   g.name AS genre_name
+                   g.name AS genre_name,
+                   d.id AS director_id,
+                   d.name AS director_name
             FROM films AS f
             JOIN mpa AS m ON m.id = f.mpa_id
             LEFT JOIN films_genres AS fg ON fg.film_id = f.id
             LEFT JOIN genres AS g ON g.id = fg.genre_id
-            ORDER BY f.id, g.id
+            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+            LEFT JOIN directors AS d ON d.id = fd.director_id
+            ORDER BY f.id, g.id, d.id
             """;
 
     private static final String FIND_BY_ID = """
@@ -53,13 +58,17 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                    f.mpa_id AS mpa_id,
                    m.name AS mpa_name,
                    g.id AS genre_id,
-                   g.name AS genre_name
+                   g.name AS genre_name,
+                   d.id AS director_id,
+                   d.name AS director_name
             FROM films AS f
             JOIN mpa AS m ON m.id = f.mpa_id
             LEFT JOIN films_genres AS fg ON fg.film_id = f.id
             LEFT JOIN genres AS g ON g.id = fg.genre_id
+            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+            LEFT JOIN directors AS d ON d.id = fd.director_id
             WHERE f.id = ?
-            ORDER BY g.id
+            ORDER BY f.id, g.id, d.id
             """;
 
     private static final String FIND_BY_NAME_RELEASE_DURATION = """
@@ -71,14 +80,18 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                    f.mpa_id AS mpa_id,
                    m.name AS mpa_name,
                    g.id AS genre_id,
-                   g.name AS genre_name
+                   g.name AS genre_name,
+                   d.id AS director_id,
+                   d.name AS director_name
             FROM films AS f
             JOIN mpa AS m ON m.id = f.mpa_id
             LEFT JOIN films_genres AS fg ON fg.film_id = f.id
             LEFT JOIN genres AS g ON g.id = fg.genre_id
+            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+            LEFT JOIN directors AS d ON d.id = fd.director_id
             WHERE f.name = ? AND f.release_date = ? AND f.duration = ?
             GROUP BY f.id
-            ORDER BY f.id, g.id
+            ORDER BY f.id, g.id, d.id
             """;
 
     private static final String FIND_POPULAR = """
@@ -90,7 +103,9 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                    f.mpa_id AS mpa_id,
                    m.name AS mpa_name,
                    g.id AS genre_id,
-                   g.name AS genre_name
+                   g.name AS genre_name,
+                   d.id AS director_id,
+                   d.name AS director_name
             FROM (SELECT films.id AS id,
                          COUNT(fl.user_id) AS likes
                   FROM films
@@ -102,6 +117,8 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             LEFT JOIN films_genres AS fg ON fg.film_id = f.id
             LEFT JOIN genres AS g ON g.id = fg.genre_id
             LEFT JOIN mpa AS m ON m.id = f.mpa_id
+            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+            LEFT JOIN directors AS d ON d.id = fd.director_id
             ORDER BY popular.likes DESC, f.id;
             """;
 
@@ -120,6 +137,11 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             VALUES (?, ?)
             """;
 
+    private static final String INSERT_FILMS_DIRECTORS = """
+            INSERT INTO films_directors (film_id, director_id)
+            VALUES (?, ?)
+            """;
+
     private static final String UPDATE_FILMS = """
             UPDATE films
             SET name = ?, release_date = ?, description = ?, duration = ?, mpa_id = ?
@@ -134,6 +156,11 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     private static final String DELETE_FILMS_LIKES = """
             DELETE FROM films_likes
             WHERE film_id = ? AND user_id = ?
+            """;
+
+    private static final String DELETE_FILMS_DIRECTORS = """
+            DELETE FROM films_directors
+            WHERE film_id = ?
             """;
 
     private final ResultSetExtractor<List<Film>> extractor;
@@ -197,6 +224,15 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             }
         }
 
+        if (obj.getDirectors() != null) {
+            int[] rows = batchUpdate(INSERT_FILMS_DIRECTORS,
+                    getBatchPsSetterForFilmsDirectors(id, obj.getDirectors().stream().toList()));
+            if (rows.length != obj.getGenres().size()) {
+                log.debug("Failed to insert directors when creating film: {}.", obj);
+                throw new InternalServerException("Failed to add directors when creating film.");
+            }
+        }
+
         Optional<Film> film = findById(id);
         return film.orElseThrow(() -> new InternalServerException("Failed to create film."));
     }
@@ -220,6 +256,16 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             if (rows.length != obj.getGenres().size()) {
                 log.debug("Failed to insert new genres:[{}] when updating film: {}.", obj.getGenres(), obj);
                 throw new InternalServerException("Failed to update genres when updating film.");
+            }
+        }
+
+        if (obj.getDirectors() != null) {
+            delete(DELETE_FILMS_DIRECTORS, id);
+            int[] rows = batchUpdate(INSERT_FILMS_DIRECTORS,
+                    getBatchPsSetterForFilmsDirectors(id, obj.getDirectors().stream().toList()));
+            if (rows.length != obj.getDirectors().size()) {
+                log.debug("Failed to insert new directors:[{}] when updating film: {}.", obj.getGenres(), obj);
+                throw new InternalServerException("Failed to update directors when updating film.");
             }
         }
 
@@ -254,6 +300,22 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             @Override
             public int getBatchSize() {
                 return genres.size();
+            }
+        };
+    }
+
+    private BatchPreparedStatementSetter getBatchPsSetterForFilmsDirectors(Long filmId,
+                                                                           List<Director> directors) {
+        return new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, filmId);
+                ps.setLong(2, directors.get(i).getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return directors.size();
             }
         };
     }
