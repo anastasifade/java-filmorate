@@ -7,15 +7,15 @@ import lombok.NonNull;
 
 @Data
 @AllArgsConstructor
-public class Review implements Entity {
-    private Long id;
-    private Integer rating;
+public class Review {
+    private Long reviewId;
+    @NotBlank
+    private String content;
     @NonNull
     private Boolean isPositive;
     @NonNull
     private Long userId;
     @NonNull
     private Long filmId;
-    @NotBlank
-    private String context;
+    private Integer useful;
 }
