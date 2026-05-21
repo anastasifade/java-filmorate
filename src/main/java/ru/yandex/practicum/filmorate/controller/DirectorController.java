@@ -26,7 +26,7 @@ public class DirectorController {
         return service.findAll();
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public ResponseDirectorDto findById(@PathVariable Long id) {
         log.info("Handling GET /directors/{} request.", id);
         return service.findById(id);
@@ -43,12 +43,12 @@ public class DirectorController {
     @PutMapping
     public ResponseDirectorDto update(@Valid @RequestBody UpdateDirectorDto dto) {
         log.info("Handling PUT /directors request.");
-        log.debug("PYT request to update object to: {}.", dto);
+        log.debug("PUT request to update object to: {}.", dto);
 
         return service.update(dto);
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         log.info("Handling DELETE /directors request.");

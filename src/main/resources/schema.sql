@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS genres (
 );
 
 CREATE TABLE IF NOT EXISTS films_genres (
-    film_id BIGINT REFERENCES films(id) NOT NULL,
-    genre_id BIGINT REFERENCES genres(id) NOT NULL,
+    film_id BIGINT REFERENCES films(id) ON DELETE CASCADE NOT NULL,
+    genre_id BIGINT REFERENCES genres(id) ON DELETE CASCADE NOT NULL,
     CONSTRAINT pk_films_genres PRIMARY KEY(film_id, genre_id)
 );
 
@@ -36,14 +36,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS films_likes (
-    film_id BIGINT REFERENCES films(id) NOT NULL,
-    user_id BIGINT REFERENCES users(id) NOT NULL,
+    film_id BIGINT REFERENCES films(id) ON DELETE CASCADE NOT NULL,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     CONSTRAINT pk_films_likes PRIMARY KEY(film_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS friends (
-    user_id BIGINT REFERENCES users(id) NOT NULL,
-    friend_id BIGINT REFERENCES users(id) NOT NULL,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    friend_id BIGINT REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     CONSTRAINT pk_friends PRIMARY KEY(user_id, friend_id)
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS directors (
 );
 
 CREATE TABLE IF NOT EXISTS films_directors (
-    film_id BIGINT REFERENCES films(id) NOT NULL,
-    director_id BIGINT REFERENCES directors(id) NOT NULL,
+    film_id BIGINT REFERENCES films(id) ON DELETE CASCADE NOT NULL,
+    director_id BIGINT REFERENCES directors(id) ON DELETE CASCADE NOT NULL,
     CONSTRAINT pk_films_directors PRIMARY KEY(film_id, director_id)
 );

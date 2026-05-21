@@ -5,6 +5,7 @@ import lombok.Value;
 
 @Value
 public class NewDirectorDto {
+    private Long id;
     @NotBlank
     private String name;
 }

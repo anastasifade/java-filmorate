@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exceptions.FailedToDeleteException;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Entity;
 
@@ -114,14 +113,14 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
     public void delete(long id) {
         int rowsDeleted = jdbc.update(getDeleteQuery(), id);
         if (rowsDeleted == 0) {
-            throw new InternalServerException("Error when deleting object.");
+            log.debug("No objects deleted.");
         }
     }
 
     protected void delete(String query, Object... params) {
         int rowsDeleted = jdbc.update(query, params);
         if (rowsDeleted == 0) {
-            throw new FailedToDeleteException("Error when deleting object.");
+            log.debug("No objects deleted.");
         }
     }
 

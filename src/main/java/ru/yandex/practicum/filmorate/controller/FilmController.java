@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.*;
@@ -30,6 +31,19 @@ public class FilmController {
     public Collection<ResponseFilmDto> findPopular(@RequestParam(defaultValue = "10") int count) {
         log.info("Handling GET /films/popular?count={}.", count);
         return filmService.findPopular(count);
+    }
+
+    @GetMapping("/director/{id}")
+    public Collection<ResponseFilmDto> findByDirectorSorted(@PathVariable Long id,
+                                                            @RequestParam(defaultValue = "likes") String sortBy) {
+        log.info("Handling GET /films/director/{}?sortBy={}.", id, sortBy);
+
+        try {
+            SortParam sortParam = SortParam.valueOf(sortBy.toUpperCase());
+            return filmService.findByDirectorSorted(id, sortParam);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException("Unsupported query parameter.");
+        }
     }
 
     @GetMapping("/{id}")
