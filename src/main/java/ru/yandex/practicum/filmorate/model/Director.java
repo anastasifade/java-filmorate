@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = {"id"})
 @Builder
 @AllArgsConstructor
-public class Director {
-    private final Long id;
-    private final String name;
+public class Director implements Entity {
+    private Long id;
+    private String name;
 }
