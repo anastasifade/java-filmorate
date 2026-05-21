@@ -48,4 +48,9 @@ public class ReviewService {
         return reviewStorage.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Review with id [%d] not found.", id)));
     }
+
+    public void delete(Long id) {
+        findById(id);
+        reviewStorage.delete(id);
+    }
 }

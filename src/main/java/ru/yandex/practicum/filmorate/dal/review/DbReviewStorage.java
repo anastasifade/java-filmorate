@@ -23,7 +23,6 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
     private static final String TAKE_REVIEW_BY_FILM_ID = "SELECT * FROM reviews WHERE film_id = ? " +
             "ORDER BY useful DESC LIMIT ?";
     private static final String UPDATE_REACTION = "UPDATE reviews SET useful = useful + ? WHERE id = ?";
-    private static final String UPDATE_USEFUL = "UPDATE reviews SET useful = useful + ? WHERE id = ?";
 
     public DbReviewStorage(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super("reviews", jdbc, mapper);
@@ -64,10 +63,5 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
         }
 
         jdbc.update(UPDATE_REACTION, reaction, reviewId);
-    }
-
-    @Transactional
-    public void changeUseful(Long reviewId, int usefulDelta) {
-        jdbc.update(UPDATE_USEFUL, usefulDelta, reviewId);
     }
 }
