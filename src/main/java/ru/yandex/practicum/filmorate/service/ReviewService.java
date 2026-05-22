@@ -23,8 +23,12 @@ public class ReviewService {
 
     public Review create(Review review) {
         userService.findById(review.getUserId());
-        filmService.findById(review.getFilmId());
 
+        if (review.getFilmId() < 0) {
+            throw new NotFoundException("несущуствующий id");
+        }
+
+        filmService.findById(review.getFilmId());
         return reviewStorage.create(review);
     }
 
@@ -52,5 +56,17 @@ public class ReviewService {
     public void delete(Long id) {
         findById(id);
         reviewStorage.delete(id);
+    }
+
+    public void deleteLike(Long id, Long userId) {
+        findById(id);
+        userService.findById(userId);
+        reviewStorage.deleteLikeOrDislike(id, userId);
+    }
+
+    public void deleteDislike(Long id, Long userId) {
+        findById(id);
+        userService.findById(userId);
+        reviewStorage.deleteLikeOrDislike(id, userId);
     }
 }

@@ -18,11 +18,18 @@ import java.util.Collection;
 public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage {
     private static final String CREATE_REVIEW = "INSERT INTO reviews " +
             "(content, is_positive, user_id, film_id, useful) VALUES (?, ?, ?, ?, 0)";
-    private static final String UPDATE_REVIEW = "UPDATE reviews SET content = ?, is_positive = ? WHERE id = ?";
+    private static final String UPDATE_REVIEW = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
     private static final String TAKE_REVIEWS_LIST = "SELECT * FROM reviews ORDER BY useful DESC LIMIT ?";
     private static final String TAKE_REVIEW_BY_FILM_ID = "SELECT * FROM reviews WHERE film_id = ? " +
             "ORDER BY useful DESC LIMIT ?";
-    private static final String UPDATE_REACTION = "UPDATE reviews SET useful = useful + ? WHERE id = ?";
+    private static final String UPDATE_REACTION =  "MERGE INTO review_likes (review_id, user_id, is_like) " +
+            "KEY (review_id, user_id) VALUES (?, ?, ?)";
+    private static final String UPDATE_USEFUL = "UPDATE reviews SET useful = (" +
+            "  SELECT COALESCE(SUM(CASE WHEN is_like = TRUE THEN 1 ELSE -1 END), 0) " +
+            "  FROM review_likes WHERE review_id = ?" +
+            ") WHERE review_id = ?";
+    private static final String DELETE_REACTION =
+            "DELETE FROM review_likes WHERE review_id = ? AND user_id = ?";
 
     public DbReviewStorage(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super("reviews", jdbc, mapper);
@@ -56,12 +63,29 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
     @Transactional
     @Override
     public void putLikeOrDislike(Long reviewId, Long userId, boolean isLike) {
-        int reaction = 1;
+        jdbc.update(UPDATE_REACTION, reviewId, userId, isLike);
+        jdbc.update(UPDATE_USEFUL, reviewId, reviewId);
+    }
 
-        if (!isLike) {
-            reaction = -1;
-        }
+    @Override
+    protected String getDeleteQuery() {
+        return String.format("DELETE FROM %s WHERE review_id = ?;", table);
+    }
 
-        jdbc.update(UPDATE_REACTION, reaction, reviewId);
+    @Override
+    protected String getFindByIdQuery() {
+        return String.format("SELECT * FROM %s WHERE review_id = ?;", table);
+    }
+
+    @Override
+    protected String getFindAllQuery() {
+        return String.format("SELECT * FROM %s ORDER BY review_id;", table);
+    }
+
+    @Transactional
+    @Override
+    public void deleteLikeOrDislike(Long reviewId, Long userId) {
+        jdbc.update(DELETE_REACTION, reviewId, userId);
+        jdbc.update(UPDATE_USEFUL, reviewId, reviewId);
     }
 }

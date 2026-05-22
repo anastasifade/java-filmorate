@@ -59,13 +59,13 @@ public class ReviewController {
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Handling DELETE /reviews/{}/like/{}.", id, userId);
-        reviewService.putDislike(id, userId);
+        reviewService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public void deleteDislike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("Handling DELETE /reviews/{}/dislike/{}.", id, userId);
-        reviewService.putLike(id, userId);
+        reviewService.deleteDislike(id, userId);
     }
 
     @GetMapping("/{id}")

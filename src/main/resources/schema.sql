@@ -55,3 +55,10 @@ CREATE TABLE IF NOT EXISTS reviews (
     film_id BIGINT REFERENCES films(id) NOT NULL,
     useful INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS review_likes (
+    review_id BIGINT REFERENCES reviews(review_id),
+    user_id BIGINT REFERENCES users(id),
+    is_like BOOLEAN NOT NULL,
+    PRIMARY KEY (review_id, user_id)
+);

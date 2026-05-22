@@ -1,21 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"reviewId"})
 @Builder
 public class Review implements Entity {
     private Long reviewId;
     @NotBlank
     private String content;
-    @NonNull
+    @NotNull
     private Boolean isPositive;
-    @NonNull
+    @NotNull
     private Long userId;
-    @NonNull
+    @NotNull
     private Long filmId;
     private Integer useful;
 
