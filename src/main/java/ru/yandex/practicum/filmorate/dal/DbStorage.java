@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.exceptions.FailedToDeleteException;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Entity;
 
@@ -18,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional
 @Slf4j
 public abstract class DbStorage<T extends Entity> implements Storage<T> {
 
@@ -72,7 +72,6 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
     @Override
     public abstract T create(T obj);
 
-    @Transactional
     protected Long insert(String query, Object... params) {
         log.trace("Creating object. Query: {}. Params: {}.", query, params);
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -99,7 +98,6 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
     @Override
     public abstract T update(T obj);
 
-    @Transactional
     protected void update(String query, Object... params) {
         int rowsUpdated = jdbc.update(query, params);
         if (rowsUpdated == 0) {
@@ -107,25 +105,22 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
         }
     }
 
-    @Transactional
     protected int[] batchUpdate(String query, BatchPreparedStatementSetter setter) {
         return jdbc.batchUpdate(query, setter);
     }
 
-    @Transactional
     @Override
     public void delete(long id) {
         int rowsDeleted = jdbc.update(getDeleteQuery(), id);
         if (rowsDeleted == 0) {
-            throw new InternalServerException("Error when deleting object.");
+            log.debug("No objects deleted.");
         }
     }
 
-    @Transactional
     protected void delete(String query, Object... params) {
         int rowsDeleted = jdbc.update(query, params);
         if (rowsDeleted == 0) {
-            throw new FailedToDeleteException("Error when deleting object.");
+            log.debug("No objects deleted.");
         }
     }
 

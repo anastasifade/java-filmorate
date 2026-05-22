@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -23,6 +24,7 @@ public class FilmService {
     private final UserService userService;
     private final MpaService mpaService;
     private final GenreService genreService;
+    private final DirectorService directorService;
 
     public Collection<ResponseFilmDto> findAll() {
         log.trace("GET /films request received by FilmService.");
@@ -35,6 +37,18 @@ public class FilmService {
     public Collection<ResponseFilmDto> findPopular(int count) {
         log.trace("GET /films/popular?count={} request received by FilmService.", count);
         return filmStorage.findPopular(count)
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
+    }
+
+    public Collection<ResponseFilmDto> findByDirectorSorted(Long directorId, SortParam sortBy) {
+        log.trace("GET /films/director/{}?sortBy={} received by FilmService.", directorId, sortBy.name().toLowerCase());
+
+        // validating director id
+        directorService.findById(directorId);
+
+        return filmStorage.findByDirectorSorted(directorId, sortBy)
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();
@@ -57,6 +71,10 @@ public class FilmService {
             validateGenres(dto.getGenres());
         }
 
+        if (dto.getDirectors() != null) {
+            validateDirectors(dto.getDirectors());
+        }
+
         Film film = FilmMapper.toFilm(dto);
         film = filmStorage.create(film);
         log.debug("Created film: {}.", film);
@@ -77,6 +95,9 @@ public class FilmService {
         }
         if (dto.getGenres() != null && !(dto.getGenres().isEmpty())) {
             validateGenres(dto.getGenres());
+        }
+        if (dto.getDirectors() != null && !(dto.getDirectors().isEmpty())) {
+            validateDirectors(dto.getDirectors());
         }
 
         Film film = FilmMapper.toFilm(dto, filmOptional.get());
@@ -123,6 +144,12 @@ public class FilmService {
         genres.stream()
                 .map(id -> id.getId())
                 .forEach(genreService::findById);
+    }
+
+    private void validateDirectors(Set<Id> directors) {
+        directors.stream()
+                .map(id -> id.getId())
+                .forEach(directorService::findById);
     }
 
 }

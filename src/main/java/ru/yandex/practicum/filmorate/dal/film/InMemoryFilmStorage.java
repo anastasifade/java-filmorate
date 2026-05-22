@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dal.film;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
 
@@ -18,6 +19,11 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
     @Override
     public Collection<Film> findPopular(int count) {
         return findAll().stream().sorted(FILM_LIKE_COMPARATOR).limit(count).toList();
+    }
+
+    @Override
+    public Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

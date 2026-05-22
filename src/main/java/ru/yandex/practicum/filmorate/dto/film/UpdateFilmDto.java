@@ -29,6 +29,6 @@ public class UpdateFilmDto {
     private String description;
     private Id mpa;
     private Set<Id> genres;
-
+    private Set<Id> directors;
 
 }

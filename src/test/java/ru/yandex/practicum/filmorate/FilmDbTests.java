@@ -126,6 +126,7 @@ public class FilmDbTests {
 
         film.setName(newName);
         film.setGenres(newGenres);
+        film.setDirectors(null);
 
         film = filmStorage.update(film);
 
