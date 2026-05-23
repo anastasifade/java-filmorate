@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.enums.SearchParam;
 import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.exceptions.FailedToDeleteException;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
@@ -20,9 +21,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Repository
@@ -215,6 +214,31 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             WHERE film_id = ?
             """;
 
+    private static final String FIND_FILMS_BY_PARAMS = """
+            SELECT f.id AS id,
+                   f.name AS name,
+                   f.release_date AS release_date,
+                   f.description AS description,
+                   f.duration AS duration,
+                   f.mpa_id AS mpa_id,
+                   m.name AS mpa_name,
+                   g.id AS genre_id,
+                   g.name AS genre_name,
+                   d.id AS director_id,
+                   d.name AS director_name
+            FROM films AS f
+            JOIN mpa AS m ON m.id = f.mpa_id
+            LEFT JOIN films_genres AS fg ON fg.film_id = f.id
+            LEFT JOIN genres AS g ON g.id = fg.genre_id
+            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+            LEFT JOIN directors AS d ON d.id = fd.director_id
+            LEFT JOIN (
+                SELECT film_id, COUNT(user_id) AS likes_count
+                FROM films_likes
+                GROUP BY film_id
+            ) AS film_likes ON film_likes.film_id = f.id
+            """;
+
     private final ResultSetExtractor<List<Film>> extractor;
 
     public DbFilmStorage(JdbcTemplate jdbc, ResultSetExtractor<List<Film>> extractor) {
@@ -264,6 +288,31 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     public Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy) {
         String query = sortBy.equals(SortParam.YEAR) ? FIND_BY_DIRECTOR_SORT_YEAR : FIND_BY_DIRECTOR_SORT_LIKES;
         return findMany(query, extractor, directorId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Collection<Film> searchFilmsByParams(String query, Set<SearchParam> searchParams) {
+        List<String> conditions = new ArrayList<>();
+        List<String> params = new ArrayList<>();
+
+        if (searchParams.contains(SearchParam.TITLE)) {
+            conditions.add("LOWER(f.name) LIKE ?");
+            params.add("%" + query.toLowerCase() + "%");
+        }
+        if (searchParams.contains(SearchParam.DIRECTOR)) {
+            conditions.add("LOWER(d.name) LIKE ?");
+            params.add("%" + query.toLowerCase() + "%");
+        }
+
+        if (conditions.isEmpty())
+            return List.of();
+
+        String sql = FIND_FILMS_BY_PARAMS +
+                "WHERE " + String.join(" OR ", conditions) + " " +
+                "ORDER BY film_likes.likes_count DESC, f.id";
+
+        return findMany(sql, extractor, params.toArray());
     }
 
     @Transactional

@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.enums.SearchParam;
 import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -49,6 +51,21 @@ public class FilmService {
         directorService.findById(directorId);
 
         return filmStorage.findByDirectorSorted(directorId, sortBy)
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
+    }
+
+    public Collection<ResponseFilmDto> searchFilms(String query, String by) {
+        log.trace("GET /films/search?query={}&by={}.", query, by);
+
+        Set<SearchParam> searchParams = Arrays.stream(by.split(","))
+                .map(String::trim)
+                .map(String::toUpperCase)
+                .map(SearchParam::valueOf)
+                .collect(Collectors.toSet());
+
+        return filmStorage.searchFilmsByParams(query, searchParams)
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();
