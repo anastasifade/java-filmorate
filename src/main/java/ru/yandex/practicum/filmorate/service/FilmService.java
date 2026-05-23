@@ -42,6 +42,17 @@ public class FilmService {
                 .toList();
     }
 
+    public Collection<ResponseFilmDto> findPopular(int count, Long genreId, int year) {
+        log.trace("GET /films/popular?count={}&genreId={}&year={} request received by FilmService.", count, genreId, year);
+
+        genreService.findById(genreId);
+
+        return filmStorage.findPopular(count, genreId, year)
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
+    }
+
     public Collection<ResponseFilmDto> findByDirectorSorted(Long directorId, SortParam sortBy) {
         log.trace("GET /films/director/{}?sortBy={} received by FilmService.", directorId, sortBy.name().toLowerCase());
 

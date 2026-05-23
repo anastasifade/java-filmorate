@@ -121,7 +121,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             LEFT JOIN mpa AS m ON m.id = f.mpa_id
             LEFT JOIN films_directors AS fd ON fd.film_id = f.id
             LEFT JOIN directors AS d ON d.id = fd.director_id
-            ORDER BY popular.likes DESC, f.id;
             """;
 
     private static final String FIND_BY_DIRECTOR_SORT_LIKES = """
@@ -257,7 +256,15 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     @Transactional(readOnly = true)
     @Override
     public Collection<Film> findPopular(int count) {
-        return findMany(FIND_POPULAR, extractor, count);
+        return findMany(FIND_POPULAR + "ORDER BY popular.likes DESC, f.id;", extractor, count);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Collection<Film> findPopular(int count, Long genreId, int year) {
+        String sql = FIND_POPULAR + "WHERE fg.genre_id = ? AND YEAR(f.release_date) = ? " +
+                "ORDER BY popular.likes DESC, f.id;";
+        return findMany(sql, extractor, count, genreId, year);
     }
 
     @Transactional(readOnly = true)

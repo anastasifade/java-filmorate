@@ -33,6 +33,13 @@ public class FilmController {
         return filmService.findPopular(count);
     }
 
+    @GetMapping("/popular?count={limit}&genreId={genreId}&year={year}")
+    public Collection<ResponseFilmDto> findPopular(@RequestParam int count, @RequestParam Long genreId,
+                                                   @RequestParam int year) {
+        log.info("Handling GET /films/popular?count={}&genreId={}&year={}.", count, genreId, year);
+        return filmService.findPopular(count, genreId, year);
+    }
+
     @GetMapping("/director/{id}")
     public Collection<ResponseFilmDto> findByDirectorSorted(@PathVariable Long id,
                                                             @RequestParam(defaultValue = "likes") String sortBy) {
