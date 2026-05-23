@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.review.NewReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.ResponseReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewDto;
-import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import java.util.Collection;
