@@ -77,4 +77,10 @@ public class FilmController {
         log.info("Handling GET /films/search?query={}&by={}.", query, by);
         return filmService.searchFilms(query, by);
     }
+
+    @DeleteMapping("/{filmId}")
+    public void delete(@PathVariable Long filmId) {
+        log.info("Handling DELETE /films/{}.", filmId);
+        filmService.delete(filmId);
+    }
 }

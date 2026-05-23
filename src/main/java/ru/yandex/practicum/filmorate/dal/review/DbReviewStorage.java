@@ -29,7 +29,7 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
             "  FROM review_likes WHERE review_id = ?" +
             ") WHERE review_id = ?";
     private static final String DELETE_REACTION =
-            "DELETE FROM review_likes WHERE review_id = ? AND user_id = ?";
+            "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_like = ?";
 
     public DbReviewStorage(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super("reviews", jdbc, mapper);
@@ -83,9 +83,26 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
     }
 
     @Transactional
-    @Override
-    public void deleteLikeOrDislike(Long reviewId, Long userId) {
-        jdbc.update(DELETE_REACTION, reviewId, userId);
-        jdbc.update(UPDATE_USEFUL, reviewId, reviewId);
+    public boolean deleteLike(Long reviewId, Long userId) {
+        int rowsDelete = jdbc.update(DELETE_REACTION, reviewId, userId, true);
+
+        if (rowsDelete > 0) {
+            jdbc.update(UPDATE_USEFUL, reviewId, reviewId);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Transactional
+    public boolean deleteDislike(Long reviewId, Long userId) {
+        int rowsDelete = jdbc.update(DELETE_REACTION, reviewId, userId, false);
+
+        if (rowsDelete > 0) {
+            jdbc.update(UPDATE_USEFUL, reviewId, reviewId);
+            return true;
+        }
+
+        return false;
     }
 }

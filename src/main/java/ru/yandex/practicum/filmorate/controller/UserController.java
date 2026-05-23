@@ -53,4 +53,9 @@ public class UserController {
         return responseDto;
     }
 
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable Long userId) {
+        log.info("Handling DELETE /users/{}.", userId);
+        userService.delete(userId);
+    }
 }

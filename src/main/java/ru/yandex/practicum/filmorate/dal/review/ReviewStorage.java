@@ -10,5 +10,7 @@ public interface ReviewStorage extends Storage<Review> {
 
     void putLikeOrDislike(Long reviewId, Long userId, boolean isLike);
 
-    void deleteLikeOrDislike(Long reviewId, Long userId);
+    boolean deleteLike(Long reviewId, Long userId);
+
+    boolean deleteDislike(Long reviewId, Long userId);
 }
