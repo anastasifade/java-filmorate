@@ -148,6 +148,15 @@ public class FilmService {
         filmStorage.deleteLike(filmId, userId);
     }
 
+    public Collection<ResponseFilmDto> recommend(Long userId) {
+        log.trace("GET /users/{}/recommendations received by FilmService.", userId);
+        userService.findById(userId); // validating userId
+        return filmStorage.recommend(userId)
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
+    }
+
     private void throwNotFound(long id) {
         log.warn("Film with id={} not found.", id);
         throw new NotFoundException(String.format("Film with id [%d] not found.", id));
