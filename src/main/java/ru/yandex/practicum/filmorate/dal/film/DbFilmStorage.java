@@ -20,6 +20,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -101,14 +102,14 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             popular AS (SELECT f.id, COUNT(fl.user_id) AS likes
                         FROM films f
                         LEFT JOIN films_likes fl ON fl.film_id = f.id
-                        GROUP BY f.id
-                        ORDER BY likes DESC, f.id),
+                        GROUP BY f.id),
             sel AS (SELECT f.*,
                     m.name AS mpa_name,
                     g.id AS genre_id,
                     g.name AS genre_name,
                     d.id AS director_id,
-                    d.name AS director_name
+                    d.name AS director_name,
+                    p.likes AS likes
                     FROM popular p
                     LEFT JOIN films AS f ON f.id = p.id
                     LEFT JOIN films_genres AS fg ON fg.film_id = f.id
@@ -119,8 +120,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             SELECT *
             FROM   sel
             """;
-
-    private static final String LIMIT = " LIMIT ? ";
 
     private static final String FIND_BY_DIRECTOR_SORT_LIKES = """
             SELECT f.id AS id,
@@ -255,14 +254,31 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     @Transactional(readOnly = true)
     @Override
     public Collection<Film> findPopular(int count, Long genreId, Integer year) {
+        StringBuilder sql = new StringBuilder(FIND_POPULAR);
+        List<Object> params = new ArrayList<>();
+
+        if (genreId != null || year != null) {
+            sql.append(" WHERE ");
+            List<String> conditions = new ArrayList<>();
+
+            if (genreId != null) {
+                conditions.add("id IN (SELECT film_id FROM films_genres WHERE genre_id = ?)");
+                params.add(genreId);
+            }
+            if (year != null) {
+                conditions.add("YEAR(release_date) = ?");
+                params.add(year);
+            }
+
+            sql.append(String.join(" AND ", conditions));
+            sql.append("ORDER BY id ");
+        }
         if (genreId == null && year == null)
-            return findMany(FIND_POPULAR + LIMIT, extractor, count);
-        else if (genreId != null && year == null)
-            return findMany(FIND_POPULAR + " WHERE genre_id = ? " + LIMIT, extractor, genreId, count);
-        else if (genreId == null)
-            return findMany(FIND_POPULAR + " WHERE YEAR(release_date) = ? " + LIMIT, extractor, year, count);
-        else
-            return findMany(FIND_POPULAR + " WHERE genre_id = ? AND YEAR(release_date) = ? " + LIMIT, extractor, genreId, year, count);
+            sql.append("ORDER BY likes DESC, id");
+        sql.append(" LIMIT ?");
+
+        params.add(count);
+        return findMany(sql.toString(), extractor, params.toArray());
     }
 
     @Transactional(readOnly = true)
