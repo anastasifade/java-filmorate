@@ -97,31 +97,30 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             """;
 
     private static final String FIND_POPULAR = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
-                   m.name AS mpa_name,
-                   g.id AS genre_id,
-                   g.name AS genre_name,
-                   d.id AS director_id,
-                   d.name AS director_name
-            FROM (SELECT films.id AS id,
-                         COUNT(fl.user_id) AS likes
-                  FROM films
-                  LEFT JOIN films_likes AS fl ON fl.film_id = films.id
-                  GROUP BY films.id
-                  ORDER BY likes DESC, films.id
-                  LIMIT ?) popular
-            LEFT JOIN films AS f ON f.id = popular.id
-            LEFT JOIN films_genres AS fg ON fg.film_id = f.id
-            LEFT JOIN genres AS g ON g.id = fg.genre_id
-            LEFT JOIN mpa AS m ON m.id = f.mpa_id
-            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
-            LEFT JOIN directors AS d ON d.id = fd.director_id
+            WITH
+            popular AS (SELECT f.id, COUNT(fl.user_id) AS likes
+                        FROM films f
+                        LEFT JOIN films_likes fl ON fl.film_id = f.id
+                        GROUP BY f.id
+                        ORDER BY likes DESC, f.id),
+            sel AS (SELECT f.*,
+                    m.name AS mpa_name,
+                    g.id AS genre_id,
+                    g.name AS genre_name,
+                    d.id AS director_id,
+                    d.name AS director_name
+                    FROM popular p
+                    LEFT JOIN films AS f ON f.id = p.id
+                    LEFT JOIN films_genres AS fg ON fg.film_id = f.id
+                    LEFT JOIN genres AS g ON g.id = fg.genre_id
+                    LEFT JOIN mpa AS m ON m.id = f.mpa_id
+                    LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+                    LEFT JOIN directors AS d ON d.id = fd.director_id)
+            SELECT *
+            FROM   sel
             """;
+
+    private static final String LIMIT = " LIMIT ? ";
 
     private static final String FIND_BY_DIRECTOR_SORT_LIKES = """
             SELECT f.id AS id,
@@ -255,16 +254,15 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<Film> findPopular(int count) {
-        return findMany(FIND_POPULAR + "ORDER BY popular.likes DESC, f.id;", extractor, count);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Collection<Film> findPopular(int count, Long genreId, int year) {
-        String sql = FIND_POPULAR + "WHERE fg.genre_id = ? AND YEAR(f.release_date) = ? " +
-                "ORDER BY popular.likes DESC, f.id;";
-        return findMany(sql, extractor, count, genreId, year);
+    public Collection<Film> findPopular(int count, Long genreId, Integer year) {
+        if (genreId == null && year == null)
+            return findMany(FIND_POPULAR + LIMIT, extractor, count);
+        else if (genreId != null && year == null)
+            return findMany(FIND_POPULAR + " WHERE genre_id = ? " + LIMIT, extractor, genreId, count);
+        else if (genreId == null)
+            return findMany(FIND_POPULAR + " WHERE YEAR(release_date) = ? " + LIMIT, extractor, year, count);
+        else
+            return findMany(FIND_POPULAR + " WHERE genre_id = ? AND YEAR(release_date) = ? " + LIMIT, extractor, genreId, year, count);
     }
 
     @Transactional(readOnly = true)
