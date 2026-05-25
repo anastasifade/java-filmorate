@@ -34,23 +34,23 @@ public class FilmService {
                 .toList();
     }
 
-    public Collection<ResponseFilmDto> findPopular(int count) {
-        log.trace("GET /films/popular?count={} request received by FilmService.", count);
-        return filmStorage.findPopular(count)
-                .stream()
-                .map(FilmMapper::toDto)
-                .toList();
-    }
+    public Collection<ResponseFilmDto> findPopular(int count, Long genreId, Integer year) {
+        log.trace("GET /films/popular request received by FilmService.");
 
-    public Collection<ResponseFilmDto> findPopular(int count, Long genreId, int year) {
-        log.trace("GET /films/popular?count={}&genreId={}&year={} request received by FilmService.", count, genreId, year);
-
-        genreService.findById(genreId);
-
-        return filmStorage.findPopular(count, genreId, year)
-                .stream()
-                .map(FilmMapper::toDto)
-                .toList();
+        if (genreId != null && year != null) {
+            log.trace("GET /films/popular?count={}&genreId={}&year={}", count, genreId, year);
+            genreService.findById(genreId);
+            return filmStorage.findPopular(count, genreId, year)
+                    .stream()
+                    .map(FilmMapper::toDto)
+                    .toList();
+        } else {
+            log.trace("GET /films/popular?count={}", count);
+            return filmStorage.findPopular(count)
+                    .stream()
+                    .map(FilmMapper::toDto)
+                    .toList();
+        }
     }
 
     public Collection<ResponseFilmDto> findByDirectorSorted(Long directorId, SortParam sortBy) {

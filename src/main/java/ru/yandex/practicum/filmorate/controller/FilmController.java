@@ -28,15 +28,10 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<ResponseFilmDto> findPopular(@RequestParam(defaultValue = "10") int count) {
-        log.info("Handling GET /films/popular?count={}.", count);
-        return filmService.findPopular(count);
-    }
-
-    @GetMapping("/popular?count={limit}&genreId={genreId}&year={year}")
-    public Collection<ResponseFilmDto> findPopular(@RequestParam int count, @RequestParam Long genreId,
-                                                   @RequestParam int year) {
-        log.info("Handling GET /films/popular?count={}&genreId={}&year={}.", count, genreId, year);
+    public Collection<ResponseFilmDto> findPopular(@RequestParam(defaultValue = "10") int count,
+                                                   @RequestParam(required = false) Long genreId,
+                                                   @RequestParam(required = false) Integer year) {
+        log.info("Handling GET /films/popular");
         return filmService.findPopular(count, genreId, year);
     }
 
