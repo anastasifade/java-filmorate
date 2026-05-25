@@ -115,7 +115,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                     LEFT JOIN mpa AS m ON m.id = f.mpa_id
                     LEFT JOIN films_directors AS fd ON fd.film_id = f.id
                     LEFT JOIN directors AS d ON d.id = fd.director_id)
-            SELECT *
+            SELECT DISTINCT *
             FROM   sel
             """;
 
