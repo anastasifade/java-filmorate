@@ -115,7 +115,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                     LEFT JOIN mpa AS m ON m.id = f.mpa_id
                     LEFT JOIN films_directors AS fd ON fd.film_id = f.id
                     LEFT JOIN directors AS d ON d.id = fd.director_id)
-            SELECT DISTINCT *
+            SELECT *
             FROM   sel
             """;
 
@@ -294,12 +294,9 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             }
 
             sql.append(String.join(" AND ", conditions));
-            sql.append("ORDER BY id ");
         }
-        if (genreId == null && year == null)
-            sql.append("ORDER BY likes DESC, id");
+        sql.append(" ORDER BY likes DESC, id");
         sql.append(" LIMIT ?");
-
         params.add(count);
         return findMany(sql.toString(), extractor, params.toArray());
     }
