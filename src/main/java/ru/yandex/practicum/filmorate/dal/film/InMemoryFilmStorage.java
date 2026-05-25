@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.dal.film;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.enums.SearchParam;
 import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
@@ -46,4 +45,8 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
         storage.get(filmId).getLikes().remove(userId);
     }
 
+    @Override
+    public Collection<Film> searchFilmsByParams(String query, Set<SearchParam> searchParams) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -73,4 +73,10 @@ public class FilmController {
         log.debug("Updated object: {}.", film);
         return film;
     }
+
+    @GetMapping("/search")
+    public Collection<ResponseFilmDto> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("Handling GET /films/search?query={}&by={}.", query, by);
+        return filmService.searchFilms(query, by);
+    }
 }
