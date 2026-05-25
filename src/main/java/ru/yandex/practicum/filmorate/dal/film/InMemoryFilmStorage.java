@@ -49,4 +49,9 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
     public Collection<Film> searchFilmsByParams(String query, Set<SearchParam> searchParams) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Collection<Film> recommend(Long userId) {
+        throw new UnsupportedOperationException();
+    }
 }

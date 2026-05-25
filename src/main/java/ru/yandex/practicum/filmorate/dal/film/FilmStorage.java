@@ -23,4 +23,6 @@ public interface FilmStorage extends Storage<Film> {
     void deleteLike(Long filmId, Long userId);
 
     Collection<Film> searchFilmsByParams(String query, Set<SearchParam> searchParams);
+
+    Collection<Film> recommend(Long userId);
 }
