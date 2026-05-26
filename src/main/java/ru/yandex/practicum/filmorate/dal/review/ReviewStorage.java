@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import java.util.Collection;
 
 public interface ReviewStorage extends Storage<Review> {
+
     Collection<Review> findByFilmId(Long filmId, int count);
 
     void putLikeOrDislike(Long reviewId, Long userId, boolean isLike);
