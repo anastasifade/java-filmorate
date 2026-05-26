@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface FilmStorage extends Storage<Film> {
 
-    Collection<Film> findPopular(int count);
+    Collection<Film> findPopular(int count, Long genreId, Integer year);
 
     Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy);
 

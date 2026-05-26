@@ -36,9 +36,10 @@ public class FilmService {
                 .toList();
     }
 
-    public Collection<ResponseFilmDto> findPopular(int count) {
-        log.trace("GET /films/popular?count={} request received by FilmService.", count);
-        return filmStorage.findPopular(count)
+    public Collection<ResponseFilmDto> findPopular(int count, Long genreId, Integer year) {
+        log.trace("GET /films/popular request received by FilmService.");
+
+        return filmStorage.findPopular(count, genreId, year)
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();

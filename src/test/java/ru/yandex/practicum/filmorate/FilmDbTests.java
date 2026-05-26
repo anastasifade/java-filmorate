@@ -60,14 +60,14 @@ public class FilmDbTests {
 
         filmStorage.addLike(newFilm.getId(), 1L);
 
-        List<Film> films = filmStorage.findPopular(1).stream().toList();
+        List<Film> films = filmStorage.findPopular(1, null, null).stream().toList();
         Assertions.assertFalse(films.isEmpty());
         assertThat(films.getFirst())
                 .hasFieldOrPropertyWithValue("id", newFilm.getId());
 
         filmStorage.deleteLike(newFilm.getId(), 1L);
 
-        films = filmStorage.findPopular(1).stream().toList();
+        films = filmStorage.findPopular(1, null, null).stream().toList();
         Assertions.assertFalse(films.isEmpty());
         assertThat(films.getFirst())
                 .hasFieldOrPropertyWithValue("id", 1L);
