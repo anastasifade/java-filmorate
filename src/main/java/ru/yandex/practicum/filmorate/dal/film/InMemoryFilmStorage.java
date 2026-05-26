@@ -16,7 +16,7 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
             (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();
 
     @Override
-    public Collection<Film> findPopular(int count) {
+    public Collection<Film> findPopular(int count, Long genreId, Integer year) {
         return findAll().stream().sorted(FILM_LIKE_COMPARATOR).limit(count).toList();
     }
 
@@ -47,6 +47,11 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
 
     @Override
     public Collection<Film> searchFilmsByParams(String query, Set<SearchParam> searchParams) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<Film> recommend(Long userId) {
         throw new UnsupportedOperationException();
     }
 }

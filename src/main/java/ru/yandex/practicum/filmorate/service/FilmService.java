@@ -36,9 +36,10 @@ public class FilmService {
                 .toList();
     }
 
-    public Collection<ResponseFilmDto> findPopular(int count) {
-        log.trace("GET /films/popular?count={} request received by FilmService.", count);
-        return filmStorage.findPopular(count)
+    public Collection<ResponseFilmDto> findPopular(int count, Long genreId, Integer year) {
+        log.trace("GET /films/popular request received by FilmService.");
+
+        return filmStorage.findPopular(count, genreId, year)
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();
@@ -146,6 +147,15 @@ public class FilmService {
         userService.findById(userId);
 
         filmStorage.deleteLike(filmId, userId);
+    }
+
+    public Collection<ResponseFilmDto> recommend(Long userId) {
+        log.trace("GET /users/{}/recommendations received by FilmService.", userId);
+        userService.findById(userId); // validating userId
+        return filmStorage.recommend(userId)
+                .stream()
+                .map(FilmMapper::toDto)
+                .toList();
     }
 
     private void throwNotFound(long id) {

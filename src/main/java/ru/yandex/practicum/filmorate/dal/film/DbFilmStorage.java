@@ -96,6 +96,30 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             """;
 
     private static final String FIND_POPULAR = """
+            WITH
+            popular AS (SELECT f.id, COUNT(fl.user_id) AS likes
+                        FROM films f
+                        LEFT JOIN films_likes fl ON fl.film_id = f.id
+                        GROUP BY f.id),
+            sel AS (SELECT f.*,
+                    m.name AS mpa_name,
+                    g.id AS genre_id,
+                    g.name AS genre_name,
+                    d.id AS director_id,
+                    d.name AS director_name,
+                    p.likes AS likes
+                    FROM popular p
+                    LEFT JOIN films AS f ON f.id = p.id
+                    LEFT JOIN films_genres AS fg ON fg.film_id = f.id
+                    LEFT JOIN genres AS g ON g.id = fg.genre_id
+                    LEFT JOIN mpa AS m ON m.id = f.mpa_id
+                    LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+                    LEFT JOIN directors AS d ON d.id = fd.director_id)
+            SELECT *
+            FROM   sel
+            """;
+
+    private static final String FIND_RECOMMENDED_FILMS = """
             SELECT f.id AS id,
                    f.name AS name,
                    f.release_date AS release_date,
@@ -107,20 +131,36 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                    g.name AS genre_name,
                    d.id AS director_id,
                    d.name AS director_name
-            FROM (SELECT films.id AS id,
-                         COUNT(fl.user_id) AS likes
-                  FROM films
-                  LEFT JOIN films_likes AS fl ON fl.film_id = films.id
-                  GROUP BY films.id
-                  ORDER BY likes DESC, films.id
-                  LIMIT ?) popular
-            LEFT JOIN films AS f ON f.id = popular.id
+            FROM films AS f
             LEFT JOIN films_genres AS fg ON fg.film_id = f.id
             LEFT JOIN genres AS g ON g.id = fg.genre_id
             LEFT JOIN mpa AS m ON m.id = f.mpa_id
             LEFT JOIN films_directors AS fd ON fd.film_id = f.id
             LEFT JOIN directors AS d ON d.id = fd.director_id
-            ORDER BY popular.likes DESC, f.id;
+            WHERE f.id IN (
+                SELECT films_likes.film_id
+                FROM films_likes
+                WHERE films_likes.user_id IN (
+                    SELECT max_common_likes.user_id
+                    FROM (
+                        SELECT user_id, COUNT(film_id)
+                        FROM films_likes
+                        WHERE user_id <> ? AND film_id IN (
+                            SELECT film_id
+                            FROM films_likes
+                            WHERE user_id = ?
+                        )
+                        GROUP BY user_id
+                        ORDER BY COUNT(film_id) DESC
+                        LIMIT 1
+                    ) AS max_common_likes
+                )
+            ) AND f.id NOT IN (
+                SELECT films_likes.film_id
+                FROM films_likes
+                WHERE films_likes.user_id = ?
+            )
+            ORDER BY f.id
             """;
 
     private static final String FIND_BY_DIRECTOR_SORT_LIKES = """
@@ -280,8 +320,29 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<Film> findPopular(int count) {
-        return findMany(FIND_POPULAR, extractor, count);
+    public Collection<Film> findPopular(int count, Long genreId, Integer year) {
+        StringBuilder sql = new StringBuilder(FIND_POPULAR);
+        List<Object> params = new ArrayList<>();
+
+        if (genreId != null || year != null) {
+            sql.append(" WHERE ");
+            List<String> conditions = new ArrayList<>();
+
+            if (genreId != null) {
+                conditions.add("id IN (SELECT film_id FROM films_genres WHERE genre_id = ?)");
+                params.add(genreId);
+            }
+            if (year != null) {
+                conditions.add("YEAR(release_date) = ?");
+                params.add(year);
+            }
+
+            sql.append(String.join(" AND ", conditions));
+        }
+        sql.append(" ORDER BY likes DESC, id");
+        sql.append(" LIMIT ?");
+        params.add(count);
+        return findMany(sql.toString(), extractor, params.toArray());
     }
 
     @Transactional(readOnly = true)
@@ -315,7 +376,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         return findMany(sql, extractor, params.toArray());
     }
 
-    @Transactional
     @Override
     public Film create(Film obj) {
         Long id = insert(INSERT_FILM,
@@ -347,7 +407,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         return film.orElseThrow(() -> new InternalServerException("Failed to create film."));
     }
 
-    @Transactional
     @Override
     public Film update(Film obj) {
         log.trace("Update request for film: {}.", obj);
@@ -385,13 +444,11 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         return film.orElseThrow(() -> new InternalServerException("Failed to update film."));
     }
 
-    @Transactional
     @Override
     public void addLike(Long filmId, Long userId) {
         update(INSERT_FILMS_LIKES, filmId, userId);
     }
 
-    @Transactional
     @Override
     public void deleteLike(Long filmId, Long userId) {
         try {
@@ -399,6 +456,10 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         } catch (FailedToDeleteException e) {
             log.trace("Failed to delete like by user [id={}] for film [id={}].", userId, filmId);
         }
+    }
+
+    public Collection<Film> recommend(Long userId) {
+        return findMany(FIND_RECOMMENDED_FILMS, extractor, userId, userId, userId);
     }
 
     private BatchPreparedStatementSetter getBatchPsSetterForFilmsGenres(Long filmId, List<Genre> genres) {
