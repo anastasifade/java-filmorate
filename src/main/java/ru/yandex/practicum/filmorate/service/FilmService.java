@@ -188,6 +188,7 @@ public class FilmService {
 
         filmStorage.delete(id);
     }
+
     public Collection<ResponseFilmDto> findCommonFilms(Long userId, Long friendId) {
         log.trace("GET /films/common?userId={}&friendId={} received by FilmService.", userId, friendId);
         userService.findById(userId);
