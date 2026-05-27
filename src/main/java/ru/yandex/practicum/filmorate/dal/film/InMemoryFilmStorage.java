@@ -21,6 +21,11 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
     }
 
     @Override
+    public Collection<Film> findCommonFilms(Long userId, Long friendId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy) {
         throw new UnsupportedOperationException();
     }

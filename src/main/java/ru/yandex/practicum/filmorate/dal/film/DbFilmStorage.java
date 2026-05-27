@@ -279,6 +279,38 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             ) AS film_likes ON film_likes.film_id = f.id
             """;
 
+    private static final String FIND_COMMON_FILMS = """
+            WITH
+            common AS (SELECT film_id
+                       FROM   films_likes
+                       WHERE user_id = ?
+                       AND   film_id IN (SELECT film_id
+                                         FROM films_likes
+                                         WHERE user_id = ?)),
+            popular AS (SELECT f.id, COUNT(fl.user_id) AS likes
+                        FROM common c
+                        LEFT JOIN films f ON f.id = c.film_id
+                        LEFT JOIN films_likes fl ON fl.film_id = f.id
+                        GROUP BY f.id),
+            sel AS (SELECT f.*,
+                    m.name AS mpa_name,
+                    g.id AS genre_id,
+                    g.name AS genre_name,
+                    d.id AS director_id,
+                    d.name AS director_name,
+                    p.likes AS likes
+                    FROM popular p
+                    LEFT JOIN films AS f ON f.id = p.id
+                    LEFT JOIN films_genres AS fg ON fg.film_id = f.id
+                    LEFT JOIN genres AS g ON g.id = fg.genre_id
+                    LEFT JOIN mpa AS m ON m.id = f.mpa_id
+                    LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+                    LEFT JOIN directors AS d ON d.id = fd.director_id)
+            SELECT *
+            FROM   sel
+            ORDER  BY likes DESC, id
+            """;
+
     private final ResultSetExtractor<List<Film>> extractor;
 
     public DbFilmStorage(JdbcTemplate jdbc, ResultSetExtractor<List<Film>> extractor) {
@@ -343,6 +375,12 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         sql.append(" LIMIT ?");
         params.add(count);
         return findMany(sql.toString(), extractor, params.toArray());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Collection<Film> findCommonFilms(Long userId, Long friendId) {
+        return findMany(FIND_COMMON_FILMS, extractor, userId, friendId);
     }
 
     @Transactional(readOnly = true)
