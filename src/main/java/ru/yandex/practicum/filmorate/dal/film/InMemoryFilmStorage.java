@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -28,16 +27,6 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
     @Override
     public Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<Film> findBy(String name, LocalDate release, int duration) {
-        return storage.values()
-                .stream()
-                .filter(film -> film.getName().equalsIgnoreCase(name) &&
-                        film.getReleaseDate().equals(release) &&
-                        film.getDuration() == duration)
-                .findFirst();
     }
 
     @Override

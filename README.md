@@ -5,7 +5,8 @@
 ### Description
 Filmorate provides access to a collection of films to browse, like, and connect over.
 Filmorate API supports viewing, creating and updating users and films. Users can also browse available genres and ratings (MPA).
-In addition, the API provides a way to like a movie - or remove the like, as well as adding or removing a friend.
+In addition, the API provides a way to like a movie - or remove the like, to leave a review, as well as add or remove a friend.
+The event feed provides a way for users to stay up-to-date with the most recent events. 
 
 ### Schema Description
 Filmorate databases stores data in the following tables:
@@ -16,6 +17,12 @@ Filmorate databases stores data in the following tables:
 * "users" - storing information about users.
 * "friends" - storing information about existing friendships between users. Has a one-to-many relationship with "users".
 * "films_likes" - storing information about likes. Has a one-to-many relationship with "films" and "users".
+* "directors" - storing information about directors.
+* "films_directors" - storing information about directors in relation to the films they have directed. "One-to-many" relationship with "films" and "directors".
+* "reviews" - storing information about the reviews.
+* "events" - storing information about events/user activity.
+* "operations" - storing operation types of various events (ADD, UPDATE, REMOVE).
+* "event_types" - storing supported event types (LIKE, REVIEW, FRIEND).
 
 ### API Endpoints
 Supported endpoints for films include:
@@ -133,7 +140,8 @@ WHERE user_id = ?;
 ### Описание
 Filmorate предоставляет доступ к коллекции фильмов. У пользователей есть возможность просмотра информации о них, оценки (лайков) и создания дружбы.
 API Filmorate поддерживает просмотр, создание и обновление пользователей и фильмов. Пользователи также могут просматривать доступные жанры и рейтинги (MPA).
-Кроме того, API позволяет поставить фильму лайк или убрать его, а также добавлять или удалять пользователей из списка друзей.
+Кроме того, API позволяет поставить фильму лайк или убрать его, оставить отзыв на фильм, а также добавлять или удалять пользователей из списка друзей.
+Лента событий позволит пользователям оставаться в курсе последних событий на платформе. 
 
 ### Описание схемы
 Данные представлены в следующих таблицах:
@@ -144,6 +152,12 @@ API Filmorate поддерживает просмотр, создание и о�
 * "users" – хранение информации о пользователях.
 * "friends" – хранение информации о дружбе между пользователями. Связана отношением «один ко многим» с таблицей "users".
 * "films_likes" – хранение лайков. Имеет связь «один ко многим» с таблицами "films" и "users".
+*  "directors" - хранение информации о режиссерах.
+* "films_directors" - хранение информации о работах режиссеров. Связана отношением "один ко многим" с таблицами "films", "directors".
+* "reviews" - хранение информации об отзывах.
+* "events" - хранение информации о событиях.
+* "operations" - хранение информации о поддерживаемых операциях (ADD, UPDATE, REMOVE).
+* "event_types" - хранение информации о поддерживаемых типах событий (LIKE, REVIEW, FRIEND).
 
 ### API Endpoints (конечные точки)
 Поддерживаемые конечные точки для фильмов:

@@ -5,9 +5,7 @@ import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.Storage;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 
 public interface FilmStorage extends Storage<Film> {
@@ -17,8 +15,6 @@ public interface FilmStorage extends Storage<Film> {
     Collection<Film> findCommonFilms(Long userId, Long friendId);
 
     Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy);
-
-    Optional<Film> findBy(String name, LocalDate releaseDate, int duration);
 
     void addLike(Long filmId, Long userId);
 
