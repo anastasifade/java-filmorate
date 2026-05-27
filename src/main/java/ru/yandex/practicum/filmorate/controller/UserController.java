@@ -56,6 +56,12 @@ public class UserController {
         return responseDto;
     }
 
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable Long userId) {
+        log.info("Handling DELETE /users/{}.", userId);
+        userService.delete(userId);
+    }
+
     @GetMapping("/{id}/recommendations")
     public Collection<ResponseFilmDto> recommend(@PathVariable Long id) {
         log.info("Handling GET /users/{}/recommendations.", id);

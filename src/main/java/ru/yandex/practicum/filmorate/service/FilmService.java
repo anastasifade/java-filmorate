@@ -179,6 +179,16 @@ public class FilmService {
                 .forEach(directorService::findById);
     }
 
+    public void delete(Long id) {
+        log.trace("DELETE /films/{} request received by FilmService.", id);
+
+        if (filmStorage.findById(id).isEmpty()) {
+            throwNotFound(id);
+        }
+
+        filmStorage.delete(id);
+    }
+
     public Collection<ResponseFilmDto> findCommonFilms(Long userId, Long friendId) {
         log.trace("GET /films/common?userId={}&friendId={} received by FilmService.", userId, friendId);
         userService.findById(userId);

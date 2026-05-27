@@ -80,6 +80,12 @@ public class FilmController {
         return filmService.searchFilms(query, by);
     }
 
+    @DeleteMapping("/{filmId}")
+    public void delete(@PathVariable Long filmId) {
+        log.info("Handling DELETE /films/{}.", filmId);
+        filmService.delete(filmId);
+    }
+
     @GetMapping("/common")
     public Collection<ResponseFilmDto> findCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
         log.info("Handling GET GET /films/common?userId={}&friendId={}.", userId, friendId);

@@ -161,4 +161,14 @@ public class UserService {
         throw new DuplicateDataException(String.format("Email [%s] already taken.", email));
     }
 
+    public void delete(Long id) {
+        log.trace("DELETE /users/{} request received by UserService.", id);
+
+        if (userStorage.findById(id).isEmpty()) {
+            throwNotFound(id);
+        }
+
+        userStorage.delete(id);
+    }
+
 }
