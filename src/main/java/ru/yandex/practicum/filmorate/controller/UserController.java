@@ -61,6 +61,7 @@ public class UserController {
         log.info("Handling DELETE /users/{}.", userId);
         userService.delete(userId);
     }
+
     @GetMapping("/{id}/recommendations")
     public Collection<ResponseFilmDto> recommend(@PathVariable Long id) {
         log.info("Handling GET /users/{}/recommendations.", id);
