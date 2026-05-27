@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.*;
+import java.util.Collection;
 
 @Slf4j
 @RestController
@@ -56,5 +57,10 @@ public class FilmController {
         ResponseFilmDto film = filmService.update(dto);
         log.debug("Updated object: {}.", film);
         return film;
+    }
+
+    @GetMapping("/common")
+    public Collection<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilmsSotred(userId, friendId);
     }
 }

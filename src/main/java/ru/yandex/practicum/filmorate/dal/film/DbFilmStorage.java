@@ -8,10 +8,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.exceptions.FailedToDeleteException;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.Date;
@@ -136,6 +136,14 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             WHERE film_id = ? AND user_id = ?
             """;
 
+    private static final String SHARED_MOVIES = """
+            SELECT f.id, f.name, f.release_date, f.duration, f.description, f.mpa_id
+            FROM films f
+            JOIN films_likes fl1 ON f.id = fl1.film_id AND fl1.user_id = ?
+            JOIN films_likes fl2 ON f.id = fl2.film_id AND fl2.user_id = ?
+            ORDER BY f.release_date DESC
+            """;
+
     private final ResultSetExtractor<List<Film>> extractor;
 
     public DbFilmStorage(JdbcTemplate jdbc, ResultSetExtractor<List<Film>> extractor) {
@@ -162,7 +170,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Film> findBy(String name, LocalDate releaseDate, int duration) {
+    public Optional<Film> findById(String name, LocalDate releaseDate, int duration) {
         try {
             Collection<Film> result = findMany(FIND_BY_NAME_RELEASE_DURATION, extractor,
                     name, Date.valueOf(releaseDate), duration);
@@ -241,6 +249,13 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         } catch (FailedToDeleteException e) {
             log.trace("Failed to delete like by user [id={}] for film [id={}].", userId, filmId);
         }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Collection<Film> getSharedMovies(Long userId, Long friendId) {
+        List<Film> movies = jdbc.query(SHARED_MOVIES, extractor, userId, friendId);
+        return movies;
     }
 
     private BatchPreparedStatementSetter getBatchPsSetterForFilmsGenres(Long filmId, List<Genre> genres) {

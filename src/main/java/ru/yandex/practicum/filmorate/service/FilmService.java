@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
 import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
@@ -10,9 +11,10 @@ import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -23,6 +25,8 @@ public class FilmService {
     private final UserService userService;
     private final MpaService mpaService;
     private final GenreService genreService;
+
+    //private final UndertowServletWebServerFactory undertowServletWebServerFactory;
 
     public Collection<ResponseFilmDto> findAll() {
         log.trace("GET /films request received by FilmService.");
@@ -38,6 +42,10 @@ public class FilmService {
                 .stream()
                 .map(FilmMapper::toDto)
                 .toList();
+    }
+
+    public Collection<Film> getCommonFilmsSotred(Long userId, Long friendId) {
+        return filmStorage.getSharedMovies(userId, friendId);
     }
 
     public ResponseFilmDto findById(Long id) {
