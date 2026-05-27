@@ -14,6 +14,8 @@ public interface FilmStorage extends Storage<Film> {
 
     Collection<Film> findPopular(int count, Long genreId, Integer year);
 
+    Collection<Film> findCommonFilms(Long userId, Long friendId);
+
     Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy);
 
     Optional<Film> findBy(String name, LocalDate releaseDate, int duration);

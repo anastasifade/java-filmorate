@@ -79,4 +79,10 @@ public class FilmController {
         log.info("Handling GET /films/search?query={}&by={}.", query, by);
         return filmService.searchFilms(query, by);
     }
+
+    @GetMapping("/common")
+    public Collection<ResponseFilmDto> findCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        log.info("Handling GET GET /films/common?userId={}&friendId={}.", userId, friendId);
+        return filmService.findCommonFilms(userId, friendId);
+    }
 }
