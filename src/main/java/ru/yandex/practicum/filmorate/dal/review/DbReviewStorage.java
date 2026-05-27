@@ -82,6 +82,7 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
         return String.format("SELECT * FROM %s ORDER BY review_id;", table);
     }
 
+    @Override
     @Transactional
     public boolean deleteLike(Long reviewId, Long userId) {
         int rowsDelete = jdbc.update(DELETE_REACTION, reviewId, userId, true);
@@ -94,6 +95,7 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
         return false;
     }
 
+    @Override
     @Transactional
     public boolean deleteDislike(Long reviewId, Long userId) {
         int rowsDelete = jdbc.update(DELETE_REACTION, reviewId, userId, false);
