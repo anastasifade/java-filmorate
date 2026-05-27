@@ -13,4 +13,5 @@ public interface ReviewStorage extends Storage<Review> {
     boolean deleteLike(Long reviewId, Long userId);
 
     boolean deleteDislike(Long reviewId, Long userId);
+
 }
