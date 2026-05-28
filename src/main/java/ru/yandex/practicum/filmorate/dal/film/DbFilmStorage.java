@@ -20,7 +20,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -69,29 +68,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             LEFT JOIN films_directors AS fd ON fd.film_id = f.id
             LEFT JOIN directors AS d ON d.id = fd.director_id
             WHERE f.id = ?
-            ORDER BY f.id, g.id, d.id
-            """;
-
-    private static final String FIND_BY_NAME_RELEASE_DURATION = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
-                   m.name AS mpa_name,
-                   g.id AS genre_id,
-                   g.name AS genre_name,
-                   d.id AS director_id,
-                   d.name AS director_name
-            FROM films AS f
-            JOIN mpa AS m ON m.id = f.mpa_id
-            LEFT JOIN films_genres AS fg ON fg.film_id = f.id
-            LEFT JOIN genres AS g ON g.id = fg.genre_id
-            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
-            LEFT JOIN directors AS d ON d.id = fd.director_id
-            WHERE f.name = ? AND f.release_date = ? AND f.duration = ?
-            GROUP BY f.id
             ORDER BY f.id, g.id, d.id
             """;
 
@@ -333,18 +309,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                 return Optional.empty();
             }
             return Optional.ofNullable(result.get(0));
-        } catch (EmptyResultDataAccessException ignored) {
-            return Optional.empty();
-        }
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Optional<Film> findBy(String name, LocalDate releaseDate, int duration) {
-        try {
-            Collection<Film> result = findMany(FIND_BY_NAME_RELEASE_DURATION, extractor,
-                    name, Date.valueOf(releaseDate), duration);
-            return result.stream().findFirst();
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
         }
