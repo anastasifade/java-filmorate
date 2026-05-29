@@ -16,7 +16,7 @@ public class UserMapper {
 
     public static User toUser(NewUserDto dto) {
         String login = dto.getLogin().trim();
-        String name = (dto.getName() == null) ? login : dto.getName().trim();
+        String name = (dto.getName() == null || dto.getName().isBlank()) ? login : dto.getName().trim();
         String email = dto.getEmail().trim();
 
         return User.builder()

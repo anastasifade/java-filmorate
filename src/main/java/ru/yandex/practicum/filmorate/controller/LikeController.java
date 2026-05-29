@@ -15,7 +15,6 @@ public class LikeController {
     private final FilmService filmService;
 
     @PutMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addLike(@PathVariable Long filmId, @PathVariable Long userId) {
         log.info("Handling PUT /films/{}/like/{}.", filmId, userId);
         filmService.addLike(filmId, userId);
@@ -23,7 +22,6 @@ public class LikeController {
     }
 
     @DeleteMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable Long filmId, @PathVariable Long userId) {
         log.info("Handling DELETE /films/{}/like/{}.", filmId, userId);
         filmService.deleteLike(filmId, userId);
