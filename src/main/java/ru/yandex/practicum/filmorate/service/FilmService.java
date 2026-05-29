@@ -3,13 +3,17 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.event.EventDbStorage;
 import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.enums.EventOperation;
+import ru.yandex.practicum.filmorate.enums.EventType;
 import ru.yandex.practicum.filmorate.enums.SearchParam;
 import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.EventMapper;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
@@ -27,6 +31,7 @@ public class FilmService {
     private final MpaService mpaService;
     private final GenreService genreService;
     private final DirectorService directorService;
+    private final EventDbStorage eventStorage;
 
     public Collection<ResponseFilmDto> findAll() {
         log.trace("GET /films request received by FilmService.");
@@ -135,6 +140,7 @@ public class FilmService {
         userService.findById(userId);
 
         filmStorage.addLike(filmId, userId);
+        eventStorage.create(EventMapper.newEvent(userId, filmId, EventType.LIKE, EventOperation.ADD));
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -147,6 +153,7 @@ public class FilmService {
         userService.findById(userId);
 
         filmStorage.deleteLike(filmId, userId);
+        eventStorage.create(EventMapper.newEvent(userId, filmId, EventType.LIKE, EventOperation.REMOVE));
     }
 
     public Collection<ResponseFilmDto> recommend(Long userId) {

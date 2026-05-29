@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.event.EventDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
@@ -33,6 +34,12 @@ public class UserController {
     public ResponseUserDto findById(@PathVariable Long id) {
         log.info("Handling GET /users/{}.", id);
         return userService.findById(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public Collection<EventDto> getFeed(@PathVariable Long id) {
+        log.info("Handling GET /users/{}/feed.", id);
+        return userService.getFeed(id);
     }
 
     @PostMapping
