@@ -19,7 +19,6 @@ public class NewUserDto {
     @NotBlank
     private String login;
 
-    @NullOrNotBlank
     private String name;
 
     @PastOrPresent

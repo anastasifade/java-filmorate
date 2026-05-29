@@ -76,7 +76,9 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             popular AS (SELECT f.id, COUNT(fl.user_id) AS likes
                         FROM films f
                         LEFT JOIN films_likes fl ON fl.film_id = f.id
-                        GROUP BY f.id),
+                        GROUP BY f.id
+                        ORDER BY likes DESC, f.id
+                        LIMIT ?),
             sel AS (SELECT f.*,
                     m.name AS mpa_name,
                     g.id AS genre_id,
@@ -200,7 +202,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             """;
 
     private static final String INSERT_FILMS_LIKES = """
-            INSERT INTO films_likes (film_id, user_id)
+            MERGE INTO films_likes (film_id, user_id)
             VALUES (?, ?)
             """;
 
@@ -320,6 +322,8 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         StringBuilder sql = new StringBuilder(FIND_POPULAR);
         List<Object> params = new ArrayList<>();
 
+        params.add(count);
+
         if (genreId != null || year != null) {
             sql.append(" WHERE ");
             List<String> conditions = new ArrayList<>();
@@ -336,8 +340,8 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             sql.append(String.join(" AND ", conditions));
         }
         sql.append(" ORDER BY likes DESC, id");
-        sql.append(" LIMIT ?");
-        params.add(count);
+        //sql.append(" LIMIT ?");
+        //params.add(count);
         return findMany(sql.toString(), extractor, params.toArray());
     }
 

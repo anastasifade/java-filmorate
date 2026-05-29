@@ -45,7 +45,7 @@ public class DbUserStorage extends DbStorage<User> implements UserStorage {
     private static final String FIND_FRIENDS = """
             SELECT *
             FROM users
-            WHERE id = (
+            WHERE id IN (
                 SELECT friend_id
                 FROM friends
                 WHERE user_id = ?)
