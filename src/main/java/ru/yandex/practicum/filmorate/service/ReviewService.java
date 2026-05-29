@@ -40,7 +40,7 @@ public class ReviewService {
         Review review = ReviewMapper.toEntity(dto);
         Review createdReview = reviewStorage.create(review);
 
-        eventStorage.create(EventMapper.newEvent(createdReview.getUserId(), createdReview.getFilmId(),
+        eventStorage.create(EventMapper.newEvent(createdReview.getUserId(), createdReview.getReviewId(),
                 EventType.REVIEW, EventOperation.ADD));
 
         return ReviewMapper.toDto(createdReview);
@@ -53,7 +53,7 @@ public class ReviewService {
 
         Review updatedReview = reviewStorage.update(oldReview);
 
-        eventStorage.create(EventMapper.newEvent(updatedReview.getUserId(), updatedReview.getFilmId(),
+        eventStorage.create(EventMapper.newEvent(updatedReview.getUserId(), updatedReview.getReviewId(),
                 EventType.REVIEW, EventOperation.UPDATE));
 
         return ReviewMapper.toDto(updatedReview);
@@ -77,7 +77,7 @@ public class ReviewService {
         Review rev = getReviewEntityById(id);
         reviewStorage.delete(id);
 
-        eventStorage.create(EventMapper.newEvent(rev.getUserId(), rev.getFilmId(),
+        eventStorage.create(EventMapper.newEvent(rev.getUserId(), rev.getReviewId(),
                 EventType.REVIEW, EventOperation.REMOVE));
     }
 
