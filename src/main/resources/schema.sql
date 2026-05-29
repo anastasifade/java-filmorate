@@ -89,6 +89,6 @@ CREATE TABLE IF NOT EXISTS events (
     user_id BIGINT REFERENCES users(id) NOT NULL,
     event_type BIGINT REFERENCES event_types(id) NOT NULL,
     operation BIGINT REFERENCES operations(id) NOT NULL,
-    timestamp TIMESTAMP NOT NULL,
+    timestamp BIGINT NOT NULL,
     entity_id BIGINT NOT NULL
 );

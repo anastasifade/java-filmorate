@@ -28,7 +28,7 @@ public class EventMapper {
                 .entityId(entityId)
                 .eventType(type)
                 .operation(operation)
-                .timestamp(Instant.now())
+                .timestamp(Instant.now().toEpochMilli())
                 .build();
     }
 

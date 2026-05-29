@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Event;
 
-import java.sql.Timestamp;
 import java.util.Collection;
 
 @Transactional
@@ -41,7 +40,7 @@ public class EventDbStorage extends DbStorage<Event> {
         Long id = insert(INSERT_EVENT,
                 obj.getUserId(),
                 obj.getEntityId(),
-                Timestamp.from(obj.getTimestamp()),
+                obj.getTimestamp(),
                 Long.valueOf(obj.getEventType().getId()),
                 Long.valueOf(obj.getOperation().getId()));
 
