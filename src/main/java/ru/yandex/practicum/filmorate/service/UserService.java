@@ -3,16 +3,24 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.Storage;
+import ru.yandex.practicum.filmorate.dal.event.EventDbStorage;
+import ru.yandex.practicum.filmorate.dto.event.EventDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
+import ru.yandex.practicum.filmorate.enums.EventOperation;
+import ru.yandex.practicum.filmorate.enums.EventType;
 import ru.yandex.practicum.filmorate.exceptions.DuplicateDataException;
 import ru.yandex.practicum.filmorate.exceptions.MalformedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.EventMapper;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dal.user.UserStorage;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +30,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final EventDbStorage eventStorage;
 
     public List<ResponseUserDto> findAll() {
         log.trace("GET /users request received by UserService.");
@@ -35,6 +44,15 @@ public class UserService {
             throwNotFound(id);
         }
         return UserMapper.toDto(userOptional.get());
+    }
+
+    public Collection<EventDto> getFeed(Long id) {
+        log.trace("GET /users/{}/feed request received by UserService.", id);
+        findById(id); // validating user id
+        return eventStorage.getFeed(id)
+                .stream()
+                .map(EventMapper::toDto)
+                .toList();
     }
 
     public ResponseUserDto create(NewUserDto dto) {
@@ -129,6 +147,7 @@ public class UserService {
         }
 
         userStorage.addFriend(userId, friendId);
+        eventStorage.create(EventMapper.newEvent(userId, friendId, EventType.FRIEND, EventOperation.ADD));
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -144,6 +163,7 @@ public class UserService {
         }
 
         userStorage.deleteFriend(userId, friendId);
+        eventStorage.create(EventMapper.newEvent(userId, friendId, EventType.FRIEND, EventOperation.REMOVE));
     }
 
     private void throwNotFound(Long id) {
