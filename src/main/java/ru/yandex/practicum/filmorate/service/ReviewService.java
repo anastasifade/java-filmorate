@@ -3,11 +3,15 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.event.EventDbStorage;
 import ru.yandex.practicum.filmorate.dal.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.dto.review.NewReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.ResponseReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewDto;
+import ru.yandex.practicum.filmorate.enums.EventOperation;
+import ru.yandex.practicum.filmorate.enums.EventType;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.EventMapper;
 import ru.yandex.practicum.filmorate.mappers.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
 
@@ -21,6 +25,7 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final FilmService filmService;
     private final UserService userService;
+    private final EventDbStorage eventStorage;
 
     public Collection<ResponseReviewDto> findByFilmId(Long filmId, int count) {
         return reviewStorage.findByFilmId(filmId, count).stream()
@@ -35,6 +40,9 @@ public class ReviewService {
         Review review = ReviewMapper.toEntity(dto);
         Review createdReview = reviewStorage.create(review);
 
+        eventStorage.create(EventMapper.newEvent(createdReview.getUserId(), createdReview.getFilmId(),
+                EventType.REVIEW, EventOperation.ADD));
+
         return ReviewMapper.toDto(createdReview);
     }
 
@@ -44,6 +52,10 @@ public class ReviewService {
         ReviewMapper.updateEntity(dto, oldReview);
 
         Review updatedReview = reviewStorage.update(oldReview);
+
+        eventStorage.create(EventMapper.newEvent(updatedReview.getUserId(), updatedReview.getFilmId(),
+                EventType.REVIEW, EventOperation.UPDATE));
+
         return ReviewMapper.toDto(updatedReview);
     }
 
@@ -62,8 +74,11 @@ public class ReviewService {
     }
 
     public void delete(Long id) {
-        getReviewEntityById(id);
+        Review rev = getReviewEntityById(id);
         reviewStorage.delete(id);
+
+        eventStorage.create(EventMapper.newEvent(rev.getUserId(), rev.getFilmId(),
+                EventType.REVIEW, EventOperation.REMOVE));
     }
 
     public void deleteLike(Long id, Long userId) {

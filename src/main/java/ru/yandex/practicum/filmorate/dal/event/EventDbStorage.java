@@ -26,7 +26,6 @@ public class EventDbStorage extends DbStorage<Event> {
             SELECT id, user_id, entity_id, timestamp, event_type, operation
             FROM events
             WHERE user_id = ?
-            ORDER BY timestamp DESC
             """;
 
     public EventDbStorage(final JdbcTemplate jdbc, final RowMapper<Event> mapper) {
