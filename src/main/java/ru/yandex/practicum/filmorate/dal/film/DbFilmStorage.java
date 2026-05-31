@@ -340,8 +340,6 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             sql.append(String.join(" AND ", conditions));
         }
         sql.append(" ORDER BY likes DESC, id");
-        //sql.append(" LIMIT ?");
-        //params.add(count);
         return findMany(sql.toString(), extractor, params.toArray());
     }
 

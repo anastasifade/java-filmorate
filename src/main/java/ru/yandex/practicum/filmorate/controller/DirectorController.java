@@ -33,6 +33,7 @@ public class DirectorController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDirectorDto create(@Valid @RequestBody NewDirectorDto dto) {
         log.info("Handling POST /directors request.");
         log.debug("POST request to create object: {}.", dto);

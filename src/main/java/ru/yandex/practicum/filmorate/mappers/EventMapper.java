@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.event.EventDto;
 import ru.yandex.practicum.filmorate.enums.EventOperation;
 import ru.yandex.practicum.filmorate.enums.EventType;
@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.Event;
 
 import java.time.Instant;
 
-@Component
+@UtilityClass
 public class EventMapper {
 
     public static EventDto toDto(Event event) {

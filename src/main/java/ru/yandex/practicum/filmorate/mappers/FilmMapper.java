@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
@@ -14,11 +14,8 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
+@UtilityClass
 public final class FilmMapper {
-
-    private FilmMapper() {
-    }
 
     public static Film toFilm(NewFilmDto dto) {
         String name = dto.getName().trim();

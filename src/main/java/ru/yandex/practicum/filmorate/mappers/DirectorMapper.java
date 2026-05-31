@@ -1,17 +1,14 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.director.NewDirectorDto;
 import ru.yandex.practicum.filmorate.dto.director.ResponseDirectorDto;
 import ru.yandex.practicum.filmorate.dto.director.UpdateDirectorDto;
 import ru.yandex.practicum.filmorate.model.Director;
 
-@Component
+@UtilityClass
 public final class DirectorMapper {
-
-    private DirectorMapper() {
-    }
 
     public static Director toDirectorFromId(Id id) {
         return Director.builder()

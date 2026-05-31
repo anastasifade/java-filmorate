@@ -1,15 +1,13 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.review.NewReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.ResponseReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewDto;
 import ru.yandex.practicum.filmorate.model.Review;
 
-@Component
+@UtilityClass
 public class ReviewMapper {
-    private ReviewMapper() {
-    }
 
     public static Review toEntity(NewReviewDto request) {
         if (request == null) {
