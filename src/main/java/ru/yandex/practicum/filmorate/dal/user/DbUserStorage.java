@@ -17,6 +17,7 @@ import java.util.Collection;
 @Slf4j
 @Repository
 @Primary
+@Transactional
 public class DbUserStorage extends DbStorage<User> implements UserStorage {
     private static final String INSERT_USER = """
             INSERT INTO users (login, email, name, birthday)
@@ -70,7 +71,6 @@ public class DbUserStorage extends DbStorage<User> implements UserStorage {
         super("users", jdbc, mapper);
     }
 
-    @Transactional
     @Override
     public User create(User obj) {
         log.trace("DbUserStorage received INSERT request for user: {}.", obj);
@@ -84,7 +84,6 @@ public class DbUserStorage extends DbStorage<User> implements UserStorage {
         return findById(id).orElseThrow(() -> new InternalServerException("Failed to create user."));
     }
 
-    @Transactional
     @Override
     public User update(User obj) {
         update(UPDATE_USER,
@@ -122,13 +121,11 @@ public class DbUserStorage extends DbStorage<User> implements UserStorage {
         return findMany(FIND_COMMON_FRIENDS, user1, user2);
     }
 
-    @Transactional
     @Override
     public void addFriend(Long userId, Long friendId) {
         update(ADD_FRIEND, userId, friendId);
     }
 
-    @Transactional
     @Override
     public void deleteFriend(Long userId, Long friendId) {
         try {

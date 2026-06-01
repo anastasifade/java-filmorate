@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.enums;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public enum EventType {
     LIKE(1),
     REVIEW(2),
@@ -17,15 +20,11 @@ public enum EventType {
 
     private final int id;
 
-    private EventType(int id) {
+    EventType(int id) {
         this.id = id;
     }
 
     public static EventType getType(int id) {
         return types.get(id);
-    }
-
-    public int getId() {
-        return this.id;
     }
 }

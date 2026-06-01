@@ -30,6 +30,7 @@ public class EventDbStorage extends DbStorage<Event> {
         super("events", jdbc, mapper);
     }
 
+    @Transactional(readOnly = true)
     public Collection<Event> getFeed(Long userId) {
         return findMany(GET_FEED, userId);
     }
@@ -40,8 +41,8 @@ public class EventDbStorage extends DbStorage<Event> {
                 obj.getUserId(),
                 obj.getEntityId(),
                 obj.getTimestamp(),
-                Long.valueOf(obj.getEventType().getId()),
-                Long.valueOf(obj.getOperation().getId()));
+                (long) obj.getEventType().getId(),
+                (long) obj.getOperation().getId());
 
         return findById(id).orElseThrow(() -> new InternalServerException("Failed to create an event."));
     }

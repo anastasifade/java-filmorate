@@ -25,6 +25,9 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
     protected final RowMapper<T> mapper;
 
     public DbStorage(String table, final JdbcTemplate jdbc, final RowMapper<T> mapper) {
+        if (table.contains(";")) {
+            throw new IllegalArgumentException("Invalid table name");
+        }
         this.table = table;
         this.jdbc = jdbc;
         this.mapper = mapper;

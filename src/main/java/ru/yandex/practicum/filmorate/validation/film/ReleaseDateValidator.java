@@ -18,9 +18,6 @@ public final class ReleaseDateValidator implements ConstraintValidator<ReleaseDa
         if (releaseDate == null)
             return true;
 
-        if (releaseDate.isBefore(MIN_RELEASE_DATE))
-            return false;
-
-        return true;
+        return !releaseDate.isBefore(MIN_RELEASE_DATE);
     }
 }
