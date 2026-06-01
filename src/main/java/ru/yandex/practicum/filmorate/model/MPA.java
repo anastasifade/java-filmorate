@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class MPA implements Entity {
+public final class MPA implements Entity {
     private Long id;
     private String name;
 }

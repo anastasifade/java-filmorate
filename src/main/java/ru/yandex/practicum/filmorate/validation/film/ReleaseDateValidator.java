@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import java.time.LocalDate;
 
-public class ReleaseDateValidator implements ConstraintValidator<ReleaseDateConstraint, LocalDate> {
+public final class ReleaseDateValidator implements ConstraintValidator<ReleaseDateConstraint, LocalDate> {
 
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 

@@ -16,7 +16,7 @@ import java.util.Collection;
 @RequestMapping("/directors")
 @RestController
 @Slf4j
-public class DirectorController {
+public final class DirectorController {
 
     private final DirectorService service;
 

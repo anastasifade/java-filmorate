@@ -12,7 +12,7 @@ import java.util.Collection;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GenreService {
+public final class GenreService {
 
     private final Storage<Genre> storage;
 

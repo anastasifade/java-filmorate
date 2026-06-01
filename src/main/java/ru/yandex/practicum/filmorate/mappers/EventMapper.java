@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.Event;
 import java.time.Instant;
 
 @UtilityClass
-public class EventMapper {
+public final class EventMapper {
 
     public static EventDto toDto(Event event) {
         return EventDto.builder()

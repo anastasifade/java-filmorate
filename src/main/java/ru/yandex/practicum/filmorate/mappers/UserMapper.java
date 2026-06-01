@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 
 @UtilityClass
-public class UserMapper {
+public final class UserMapper {
 
     public static User toUser(NewUserDto dto) {
         String login = dto.getLogin().trim();

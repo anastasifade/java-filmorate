@@ -8,7 +8,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Builder
-public class Film implements Entity {
+public final class Film implements Entity {
 
     private Long id;
     private String name;

@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Component
-public class FilmResultSetMapper implements ResultSetExtractor<List<Film>> {
+public final class FilmResultSetMapper implements ResultSetExtractor<List<Film>> {
     @Override
     public List<Film> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<Long, Film> filmMap = new LinkedHashMap<>();

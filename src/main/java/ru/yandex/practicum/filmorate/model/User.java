@@ -8,7 +8,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Builder
-public class User implements Entity {
+public final class User implements Entity {
 
     private Long id;
     private String email;

@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/films/{filmId}/like")
-public class LikeController {
+public final class LikeController {
 
     private final FilmService filmService;
 

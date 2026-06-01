@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.dto.review.UpdateReviewDto;
 import ru.yandex.practicum.filmorate.model.Review;
 
 @UtilityClass
-public class ReviewMapper {
+public final class ReviewMapper {
 
     public static Review toEntity(NewReviewDto request) {
         if (request == null) {

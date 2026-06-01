@@ -16,7 +16,7 @@ import java.util.Collection;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DirectorService {
+public final class DirectorService {
 
     private final DirectorDbStorage storage;
 

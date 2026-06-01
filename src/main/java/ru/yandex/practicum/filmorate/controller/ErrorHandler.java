@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @RestControllerAdvice("ru.yandex.practicum.filmorate")
-public class ErrorHandler {
+public final class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
 import java.util.*;
 
 @Component
-public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
+public final class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
 
     private static final Comparator<Film> FILM_LIKE_COMPARATOR =
             (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();

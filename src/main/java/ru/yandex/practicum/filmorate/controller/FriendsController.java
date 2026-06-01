@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users/{userId}/friends")
-public class FriendsController {
+public final class FriendsController {
 
     private final UserService userService;
 

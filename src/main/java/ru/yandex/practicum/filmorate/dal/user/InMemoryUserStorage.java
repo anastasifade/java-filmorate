@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class InMemoryUserStorage extends InMemoryStorage<User> implements UserStorage {
+public final class InMemoryUserStorage extends InMemoryStorage<User> implements UserStorage {
 
     @Override
     public boolean isLoginOccupied(String login) {

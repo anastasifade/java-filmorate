@@ -25,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public final class UserService {
 
     private final UserStorage userStorage;
     private final EventDbStorage eventStorage;

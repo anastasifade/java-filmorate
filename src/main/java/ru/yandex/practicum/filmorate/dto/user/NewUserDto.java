@@ -13,14 +13,14 @@ public class NewUserDto {
 
     @NotNull
     @Email
-    private String email;
+    String email;
 
     @NotBlank
-    private String login;
+    String login;
 
-    private String name;
+    String name;
 
     @PastOrPresent
-    private LocalDate birthday;
+    LocalDate birthday;
 
 }

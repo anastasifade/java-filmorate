@@ -19,7 +19,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-public class UserController {
+public final class UserController {
 
     private final UserService userService;
     private final FilmService filmService;
