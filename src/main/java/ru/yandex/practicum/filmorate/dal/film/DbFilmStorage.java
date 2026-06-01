@@ -293,11 +293,11 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             List<String> conditions = new ArrayList<>();
 
             if (genreId != null) {
-                conditions.add("id IN (SELECT film_id FROM films_genres WHERE genre_id = ?)");
+                conditions.add("f.id IN (SELECT film_id FROM films_genres WHERE genre_id = ?)");
                 params.add(genreId);
             }
             if (year != null) {
-                conditions.add("YEAR(release_date) = ?");
+                conditions.add("YEAR(f.release_date) = ?");
                 params.add(year);
             }
 
