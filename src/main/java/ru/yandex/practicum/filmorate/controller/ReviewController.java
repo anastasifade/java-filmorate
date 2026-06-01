@@ -16,7 +16,7 @@ import java.util.Collection;
 @RequestMapping("/reviews")
 @Slf4j
 @RequiredArgsConstructor
-public class ReviewController {
+public final class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping

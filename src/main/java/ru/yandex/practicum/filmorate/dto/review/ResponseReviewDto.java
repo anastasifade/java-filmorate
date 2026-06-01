@@ -2,18 +2,16 @@ package ru.yandex.practicum.filmorate.dto.review;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class ResponseReviewDto {
-    private Long reviewId;
-    private String content;
-    private Boolean isPositive;
-    private Long userId;
-    private Long filmId;
-    private Integer useful;
+    Long reviewId;
+    String content;
+    Boolean isPositive;
+    Long userId;
+    Long filmId;
+    Integer useful;
 }

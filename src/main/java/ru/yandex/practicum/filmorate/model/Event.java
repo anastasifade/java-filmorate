@@ -11,13 +11,11 @@ import ru.yandex.practicum.filmorate.enums.EventType;
 @EqualsAndHashCode(of = {"id"})
 @Builder
 @AllArgsConstructor
-public class Event implements Entity {
-
+public final class Event implements Entity {
     private Long id;
     private Long userId;
     private Long entityId;
     private Long timestamp;
     private EventType eventType;
     private EventOperation operation;
-
 }

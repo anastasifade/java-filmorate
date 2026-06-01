@@ -4,18 +4,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class UpdateReviewDto {
     @NotNull
-    private Long reviewId;
+    Long reviewId;
     @NotBlank
-    private String content;
+    String content;
     @NotNull
-    private Boolean isPositive;
+    Boolean isPositive;
 }

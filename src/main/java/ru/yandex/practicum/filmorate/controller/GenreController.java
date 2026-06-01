@@ -15,8 +15,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/genres")
-public class GenreController {
-
+public final class GenreController {
     private final GenreService service;
 
     @GetMapping
@@ -30,5 +29,4 @@ public class GenreController {
         log.info("Handling GET /genres/{} request.", id);
         return service.findById(id);
     }
-
 }

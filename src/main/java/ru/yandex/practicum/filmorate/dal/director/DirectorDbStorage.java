@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.model.Director;
 @Repository
 @Primary
 public class DirectorDbStorage extends DbStorage<Director> {
-
     private static final String INSERT_DIRECTOR = """
             INSERT INTO directors (name)
             VALUES (?)

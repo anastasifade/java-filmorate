@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -8,18 +10,14 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Builder
-public class Film implements Entity {
-
+public final class Film implements Entity {
     private Long id;
     private String name;
     private LocalDate releaseDate;
     private int duration;
     private String description;
-
     private Set<Director> directors;
     private Set<Genre> genres;
     private MPA mpa;
-
     private Set<Long> likes;
-
 }

@@ -22,7 +22,7 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
     private static final String TAKE_REVIEWS_LIST = "SELECT * FROM reviews ORDER BY useful DESC LIMIT ?";
     private static final String TAKE_REVIEW_BY_FILM_ID = "SELECT * FROM reviews WHERE film_id = ? " +
             "ORDER BY useful DESC LIMIT ?";
-    private static final String UPDATE_REACTION =  "MERGE INTO review_likes (review_id, user_id, is_like) " +
+    private static final String UPDATE_REACTION = "MERGE INTO review_likes (review_id, user_id, is_like) " +
             "KEY (review_id, user_id) VALUES (?, ?, ?)";
     private static final String UPDATE_USEFUL = "UPDATE reviews SET useful = (" +
             "  SELECT COALESCE(SUM(CASE WHEN is_like = TRUE THEN 1 ELSE -1 END), 0) " +
@@ -52,12 +52,8 @@ public class DbReviewStorage extends DbStorage<Review> implements ReviewStorage 
     @Transactional(readOnly = true)
     @Override
     public Collection<Review> findByFilmId(Long filmId, int count) {
-
-        if (filmId == null) {
-            return findMany(TAKE_REVIEWS_LIST, count);
-        } else {
-            return findMany(TAKE_REVIEW_BY_FILM_ID, filmId, count);
-        }
+        if (filmId == null) return findMany(TAKE_REVIEWS_LIST, count);
+        else return findMany(TAKE_REVIEW_BY_FILM_ID, filmId, count);
     }
 
     @Transactional

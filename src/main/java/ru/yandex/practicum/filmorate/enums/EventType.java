@@ -8,25 +8,24 @@ public enum EventType {
     REVIEW(2),
     FRIEND(3);
 
-    private final int id;
-
     private static final Map<Integer, EventType> types = new HashMap<>();
 
     static {
-        for (EventType type : EventType.values()) {
+        for (EventType type : EventType.values())
             types.put(type.id, type);
-        }
     }
+
+    private final int id;
 
     private EventType(int id) {
         this.id = id;
     }
 
-    public int getId() {
-        return this.id;
-    }
-
     public static EventType getType(int id) {
         return types.get(id);
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

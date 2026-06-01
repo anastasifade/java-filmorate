@@ -12,8 +12,7 @@ import java.util.Collection;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GenreService {
-
+public final class GenreService {
     private final Storage<Genre> storage;
 
     public Collection<Genre> findAll() {
@@ -26,5 +25,4 @@ public class GenreService {
         return storage.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Genre {id=%d} not found.", id)));
     }
-
 }

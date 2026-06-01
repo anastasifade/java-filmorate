@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @AllArgsConstructor
 @Builder
-public class Review implements Entity {
+public final class Review implements Entity {
     private Long reviewId;
     private String content;
     private Boolean isPositive;

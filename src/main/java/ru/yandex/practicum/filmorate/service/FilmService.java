@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.event.EventDbStorage;
+import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
 import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
@@ -16,16 +17,17 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.EventMapper;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.dal.film.FilmStorage;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FilmService {
-
+public final class FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
     private final MpaService mpaService;
@@ -53,7 +55,6 @@ public class FilmService {
     public Collection<ResponseFilmDto> findByDirectorSorted(Long directorId, SortParam sortBy) {
         log.trace("GET /films/director/{}?sortBy={} received by FilmService.", directorId, sortBy.name().toLowerCase());
 
-        // validating director id
         directorService.findById(directorId);
 
         return filmStorage.findByDirectorSorted(directorId, sortBy)
@@ -80,9 +81,8 @@ public class FilmService {
     public ResponseFilmDto findById(Long id) {
         log.trace("GET /films/{} request received by FilmService.", id);
         Optional<Film> filmOptional = filmStorage.findById(id);
-        if (filmOptional.isEmpty()) {
+        if (filmOptional.isEmpty())
             throwNotFound(id);
-        }
         return FilmMapper.toDto(filmOptional.get());
     }
 
@@ -90,13 +90,11 @@ public class FilmService {
         log.trace("POST /films request received by FilmService.");
 
         validateMpa(dto.getMpa().getId());
-        if (dto.getGenres() != null) {
+        if (dto.getGenres() != null)
             validateGenres(dto.getGenres());
-        }
 
-        if (dto.getDirectors() != null) {
+        if (dto.getDirectors() != null)
             validateDirectors(dto.getDirectors());
-        }
 
         Film film = FilmMapper.toFilm(dto);
         film = filmStorage.create(film);
@@ -109,19 +107,17 @@ public class FilmService {
         log.trace("PUT /films request received by FilmService.");
 
         Optional<Film> filmOptional = filmStorage.findById(dto.getId());
-        if (filmOptional.isEmpty()) {
+        if (filmOptional.isEmpty())
             throwNotFound(dto.getId());
-        }
 
-        if (dto.getMpa() != null) {
+        if (dto.getMpa() != null)
             validateMpa(dto.getMpa().getId());
-        }
-        if (dto.getGenres() != null && !(dto.getGenres().isEmpty())) {
+
+        if (dto.getGenres() != null && !(dto.getGenres().isEmpty()))
             validateGenres(dto.getGenres());
-        }
-        if (dto.getDirectors() != null && !(dto.getDirectors().isEmpty())) {
+
+        if (dto.getDirectors() != null && !(dto.getDirectors().isEmpty()))
             validateDirectors(dto.getDirectors());
-        }
 
         Film film = FilmMapper.toFilm(dto, filmOptional.get());
         film = filmStorage.update(film);
@@ -133,10 +129,8 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         log.trace("PUT /films/{}/likes/{} receives by FilmService.", filmId, userId);
         Optional<Film> filmOptional = filmStorage.findById(filmId);
-        if (filmOptional.isEmpty()) {
+        if (filmOptional.isEmpty())
             throwNotFound(filmId);
-        }
-        // throws NotFoundException in userService if user is not found
         userService.findById(userId);
 
         filmStorage.addLike(filmId, userId);
@@ -146,10 +140,8 @@ public class FilmService {
     public void deleteLike(Long filmId, Long userId) {
         log.trace("DELETE /films/{}/likes/{} receives by FilmService.", filmId, userId);
         Optional<Film> filmOptional = filmStorage.findById(filmId);
-        if (filmOptional.isEmpty()) {
+        if (filmOptional.isEmpty())
             throwNotFound(filmId);
-        }
-        // throws NotFoundException in userService if user is not found
         userService.findById(userId);
 
         filmStorage.deleteLike(filmId, userId);
@@ -158,7 +150,7 @@ public class FilmService {
 
     public Collection<ResponseFilmDto> recommend(Long userId) {
         log.trace("GET /users/{}/recommendations received by FilmService.", userId);
-        userService.findById(userId); // validating userId
+        userService.findById(userId);
         return filmStorage.recommend(userId)
                 .stream()
                 .map(FilmMapper::toDto)
@@ -189,9 +181,8 @@ public class FilmService {
     public void delete(Long id) {
         log.trace("DELETE /films/{} request received by FilmService.", id);
 
-        if (filmStorage.findById(id).isEmpty()) {
+        if (filmStorage.findById(id).isEmpty())
             throwNotFound(id);
-        }
 
         filmStorage.delete(id);
     }
