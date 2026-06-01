@@ -131,7 +131,6 @@ public class UserDbTests {
                 .build();
         friend = userStorage.create(friend);
 
-        // ADD FRIEND TEST
         userStorage.addFriend(user.getId(), friend.getId());
 
         List<User> userFriends = userStorage.getFriends(user.getId()).stream().toList();
@@ -140,8 +139,6 @@ public class UserDbTests {
 
         List<User> friendFriends = userStorage.getFriends(friend.getId()).stream().toList();
         Assertions.assertTrue(friendFriends.isEmpty());
-
-        // DELETE FRIEND TEST
 
         userStorage.deleteFriend(user.getId(), friend.getId());
 

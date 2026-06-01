@@ -46,7 +46,6 @@ public class FilmDbTests {
                         assertThat(film.get()).hasFieldOrPropertyWithValue("id", 1L));
     }
 
-    // Testing: add like, delete like, find popular
     @Test
     public void findPopularTest() {
         Film newFilm = Film.builder()
