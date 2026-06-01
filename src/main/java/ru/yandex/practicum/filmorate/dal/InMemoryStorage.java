@@ -45,7 +45,7 @@ public abstract class InMemoryStorage<T extends Entity> implements Storage<T> {
     }
 
     Long getNextId() {
-        Long nextId = storage.keySet().stream().mapToLong(id -> id).max().orElse(0L);
+        long nextId = storage.keySet().stream().mapToLong(id -> id).max().orElse(0L);
         return ++nextId;
     }
 }

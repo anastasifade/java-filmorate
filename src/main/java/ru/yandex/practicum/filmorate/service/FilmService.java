@@ -168,13 +168,13 @@ public final class FilmService {
 
     private void validateGenres(Set<Id> genres) {
         genres.stream()
-                .map(id -> id.getId())
+                .map(Id::getId)
                 .forEach(genreService::findById);
     }
 
     private void validateDirectors(Set<Id> directors) {
         directors.stream()
-                .map(id -> id.getId())
+                .map(Id::getId)
                 .forEach(directorService::findById);
     }
 

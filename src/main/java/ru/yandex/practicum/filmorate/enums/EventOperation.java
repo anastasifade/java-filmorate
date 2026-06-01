@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.enums;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public enum EventOperation {
     ADD(1),
     UPDATE(2),
@@ -17,15 +20,11 @@ public enum EventOperation {
 
     private final int id;
 
-    private EventOperation(int id) {
+    EventOperation(int id) {
         this.id = id;
     }
 
     public static EventOperation getOperation(int id) {
         return operations.get(id);
-    }
-
-    public int getId() {
-        return this.id;
     }
 }

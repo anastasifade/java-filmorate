@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dal.film;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -270,10 +271,10 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     public Optional<Film> findById(long id) {
         try {
             List<Film> result = jdbc.query(FIND_BY_ID, extractor, id);
-            if (result.isEmpty()) {
+            if (result == null || result.isEmpty()) {
                 return Optional.empty();
             }
-            return Optional.ofNullable(result.get(0));
+            return Optional.ofNullable(result.getFirst());
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
         }
@@ -425,6 +426,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
         }
     }
 
+    @Transactional(readOnly = true)
     public Collection<Film> recommend(Long userId) {
         return findMany(FIND_RECOMMENDED_FILMS, extractor, userId, userId);
     }
@@ -432,7 +434,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     private BatchPreparedStatementSetter getBatchPsSetterForFilmsGenres(Long filmId, List<Genre> genres) {
         return new BatchPreparedStatementSetter() {
             @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
+            public void setValues(@NonNull PreparedStatement ps, int i) throws SQLException {
                 ps.setLong(1, filmId);
                 ps.setLong(2, genres.get(i).getId());
             }
@@ -448,7 +450,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                                                                            List<Director> directors) {
         return new BatchPreparedStatementSetter() {
             @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
+            public void setValues(@NonNull PreparedStatement ps, int i) throws SQLException {
                 ps.setLong(1, filmId);
                 ps.setLong(2, directors.get(i).getId());
             }
