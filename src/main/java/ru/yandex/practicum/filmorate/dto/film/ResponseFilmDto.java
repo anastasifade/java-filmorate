@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.dto.film;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Value;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;

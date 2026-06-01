@@ -17,7 +17,6 @@ import java.util.Collection;
 @RestController
 @Slf4j
 public final class DirectorController {
-
     private final DirectorService service;
 
     @GetMapping
@@ -57,5 +56,4 @@ public final class DirectorController {
 
         service.delete(id);
     }
-
 }

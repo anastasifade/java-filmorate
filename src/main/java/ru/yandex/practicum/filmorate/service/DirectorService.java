@@ -17,7 +17,6 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 public final class DirectorService {
-
     private final DirectorDbStorage storage;
 
     public Collection<ResponseDirectorDto> findAll() {
@@ -54,7 +53,7 @@ public final class DirectorService {
 
     public void delete(Long id) {
         log.trace("DELETE /directors/{} request received by DirectorService.", id);
-        findById(id); // throws NotFoundException if director id does not exist
+        findById(id);
         storage.delete(id);
     }
 }

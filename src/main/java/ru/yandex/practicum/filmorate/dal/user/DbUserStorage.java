@@ -18,7 +18,6 @@ import java.util.Collection;
 @Repository
 @Primary
 public class DbUserStorage extends DbStorage<User> implements UserStorage {
-
     private static final String INSERT_USER = """
             INSERT INTO users (login, email, name, birthday)
             VALUES (?, ?, ?, ?)

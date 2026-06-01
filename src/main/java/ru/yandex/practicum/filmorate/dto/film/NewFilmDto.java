@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Value
 public class NewFilmDto {
-
     @NotBlank(message = "Missing title.")
     String name;
     @NotNull(message = "Missing release date.")
@@ -30,5 +29,4 @@ public class NewFilmDto {
 
     Set<Id> genres;
     Set<Id> directors;
-
 }

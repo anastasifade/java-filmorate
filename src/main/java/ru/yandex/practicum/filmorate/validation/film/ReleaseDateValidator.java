@@ -15,15 +15,12 @@ public final class ReleaseDateValidator implements ConstraintValidator<ReleaseDa
 
     @Override
     public boolean isValid(LocalDate releaseDate, ConstraintValidatorContext cxt) {
-        if (releaseDate == null) {
+        if (releaseDate == null)
             return true;
-        }
 
-        if (releaseDate.isBefore(MIN_RELEASE_DATE)) {
+        if (releaseDate.isBefore(MIN_RELEASE_DATE))
             return false;
-        }
 
         return true;
     }
-
 }

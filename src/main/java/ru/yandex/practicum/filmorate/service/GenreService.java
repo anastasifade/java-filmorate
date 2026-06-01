@@ -13,7 +13,6 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public final class GenreService {
-
     private final Storage<Genre> storage;
 
     public Collection<Genre> findAll() {
@@ -26,5 +25,4 @@ public final class GenreService {
         return storage.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Genre {id=%d} not found.", id)));
     }
-
 }

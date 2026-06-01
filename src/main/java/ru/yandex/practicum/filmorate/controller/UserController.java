@@ -20,7 +20,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/users")
 public final class UserController {
-
     private final UserService userService;
     private final FilmService filmService;
 

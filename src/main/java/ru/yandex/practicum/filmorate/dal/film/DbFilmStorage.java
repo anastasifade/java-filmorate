@@ -8,13 +8,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.enums.SearchParam;
 import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.exceptions.FailedToDeleteException;
 import ru.yandex.practicum.filmorate.exceptions.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.Date;
@@ -27,7 +27,6 @@ import java.util.*;
 @Primary
 @Transactional
 public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
-
     private static final String FIND_ALL = """
             SELECT f.*,
                    m.name AS mpa_name,
@@ -120,7 +119,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             LEFT JOIN directors d ON d.id = fd.director_id
             JOIN recommended r ON f.id = r.film_id
             ORDER BY f.id;
-    """;
+            """;
 
     private static final String FIND_BY_DIRECTOR_SORT_LIKES = """
             WITH
@@ -460,5 +459,4 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             }
         };
     }
-
 }

@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.dto.review;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
 
 @Value
 @Builder

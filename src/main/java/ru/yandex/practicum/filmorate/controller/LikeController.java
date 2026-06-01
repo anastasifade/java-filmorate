@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 @RestController
 @RequestMapping("/films/{filmId}/like")
 public final class LikeController {
-
     private final FilmService filmService;
 
     @PutMapping("/{userId}")
@@ -26,5 +25,4 @@ public final class LikeController {
         filmService.deleteLike(filmId, userId);
         log.trace("DELETE /films/{}/like/{} request successful.", filmId, userId);
     }
-
 }

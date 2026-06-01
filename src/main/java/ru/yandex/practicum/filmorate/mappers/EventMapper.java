@@ -10,7 +10,6 @@ import java.time.Instant;
 
 @UtilityClass
 public final class EventMapper {
-
     public static EventDto toDto(Event event) {
         return EventDto.builder()
                 .eventId(event.getId())
@@ -31,5 +30,4 @@ public final class EventMapper {
                 .timestamp(Instant.now().toEpochMilli())
                 .build();
     }
-
 }

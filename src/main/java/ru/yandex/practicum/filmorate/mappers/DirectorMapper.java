@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 @UtilityClass
 public final class DirectorMapper {
-
     public static Director toDirectorFromId(Id id) {
         return Director.builder()
                 .id(id.getId())

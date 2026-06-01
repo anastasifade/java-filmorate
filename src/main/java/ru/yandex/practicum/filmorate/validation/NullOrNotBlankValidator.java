@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public final class NullOrNotBlankValidator implements ConstraintValidator<NullOrNotBlank, String> {
-
     @Override
     public void initialize(NullOrNotBlank constraint) {
     }

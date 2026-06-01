@@ -15,7 +15,6 @@ import java.util.Collection;
 @Repository
 @Primary
 public class EventDbStorage extends DbStorage<Event> {
-
     private static final String INSERT_EVENT = """
             INSERT INTO events (user_id, entity_id, timestamp, event_type, operation)
             VALUES (?, ?, ?, ?, ?)

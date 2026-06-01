@@ -12,12 +12,10 @@ import ru.yandex.practicum.filmorate.enums.EventType;
 @Builder
 @AllArgsConstructor
 public final class Event implements Entity {
-
     private Long id;
     private Long userId;
     private Long entityId;
     private Long timestamp;
     private EventType eventType;
     private EventOperation operation;
-
 }

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @Value
 public class NewUserDto {
-
     @NotNull
     @Email
     String email;
@@ -22,5 +21,4 @@ public class NewUserDto {
 
     @PastOrPresent
     LocalDate birthday;
-
 }

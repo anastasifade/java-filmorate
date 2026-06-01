@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.dto.film;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
 import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.dto.Id;
@@ -14,9 +13,6 @@ import java.util.Set;
 
 @Value
 public class UpdateFilmDto {
-
-    // TODO: add custom validators to rating and genre?
-
     @NotNull(message = "Id must be provided.")
     Long id;
 
@@ -31,5 +27,4 @@ public class UpdateFilmDto {
     Id mpa;
     Set<Id> genres;
     Set<Id> directors;
-
 }

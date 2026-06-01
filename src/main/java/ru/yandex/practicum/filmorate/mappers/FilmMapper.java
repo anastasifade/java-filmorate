@@ -2,9 +2,9 @@ package ru.yandex.practicum.filmorate.mappers;
 
 import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.Id;
+import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public final class FilmMapper {
-
     public static Film toFilm(NewFilmDto dto) {
         String name = dto.getName().trim();
         String description = dto.getDescription();
@@ -88,5 +87,4 @@ public final class FilmMapper {
                 .map(id -> new Genre(id.getId(), null))
                 .collect(Collectors.toSet());
     }
-
 }

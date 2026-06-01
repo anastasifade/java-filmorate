@@ -16,7 +16,6 @@ import java.util.Collection;
 @RequestMapping("/mpa")
 @RestController
 public final class MpaController {
-
     private final MpaService service;
 
     @GetMapping
@@ -30,6 +29,4 @@ public final class MpaController {
         log.info("Handling GET /mpa/{} request.", id);
         return service.findById(id);
     }
-
-
 }

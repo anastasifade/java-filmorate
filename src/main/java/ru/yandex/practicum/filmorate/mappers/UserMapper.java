@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 @UtilityClass
 public final class UserMapper {
-
     public static User toUser(NewUserDto dto) {
         String login = dto.getLogin().trim();
         String name = (dto.getName() == null || dto.getName().isBlank()) ? login : dto.getName().trim();
@@ -48,5 +47,4 @@ public final class UserMapper {
                 .birthday(user.getBirthday())
                 .build();
     }
-
 }

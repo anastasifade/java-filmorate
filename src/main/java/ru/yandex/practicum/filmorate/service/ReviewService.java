@@ -85,9 +85,8 @@ public final class ReviewService {
         validateReviewAndUser(id, userId);
         boolean deleted = reviewStorage.deleteLike(id, userId);
 
-        if (!deleted) {
+        if (!deleted)
             throw new NotFoundException(String.format("Like from user [%d] on review [%d] not found.", userId, id));
-        }
 
         log.info("Successfully deleted like from user {} on review {}.", userId, id);
     }
@@ -96,9 +95,8 @@ public final class ReviewService {
         validateReviewAndUser(id, userId);
         boolean deleted = reviewStorage.deleteDislike(id, userId);
 
-        if (!deleted) {
+        if (!deleted)
             throw new NotFoundException(String.format("Dislike from user [%d] on review [%d] not found.", userId, id));
-        }
 
         log.info("Successfully deleted dislike from user {} on review {}.", userId, id);
     }

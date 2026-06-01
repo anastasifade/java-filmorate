@@ -33,16 +33,14 @@ public final class FilmResultSetMapper implements ResultSetExtractor<List<Film>>
                 filmMap.put(id, film);
             }
 
-            if (rs.getString("genre_name") != null) {
+            if (rs.getString("genre_name") != null)
                 filmMap.get(id).getGenres()
                         .add(new Genre(rs.getLong("genre_id"), rs.getString("genre_name")));
-            }
 
-            if (rs.getString("director_name") != null) {
+            if (rs.getString("director_name") != null)
                 filmMap.get(id).getDirectors()
                         .add(new Director(rs.getLong("director_id"),
                                 rs.getString("director_name")));
-            }
         }
 
         return new ArrayList<>(filmMap.values());

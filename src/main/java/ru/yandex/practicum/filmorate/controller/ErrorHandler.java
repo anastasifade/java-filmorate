@@ -17,7 +17,6 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice("ru.yandex.practicum.filmorate")
 public final class ErrorHandler {
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final MethodArgumentNotValidException e) {

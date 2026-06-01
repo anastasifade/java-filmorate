@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dal.DbStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-
 @Repository
 @Primary
 public class GenreDbStorage extends DbStorage<Genre> {
-
     public GenreDbStorage(final JdbcTemplate template, final RowMapper<Genre> mapper) {
         super("genres", template, mapper);
     }
@@ -23,6 +21,6 @@ public class GenreDbStorage extends DbStorage<Genre> {
 
     @Override
     public Genre update(Genre obj) {
-       throw new UnsupportedOperationException("PUT /genres not supported by the API.");
+        throw new UnsupportedOperationException("PUT /genres not supported by the API.");
     }
 }
