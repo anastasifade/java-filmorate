@@ -1,13 +1,15 @@
 package ru.yandex.practicum.filmorate.dto.director;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.NullOrNotBlank;
 
-@Value
+@Data
 public class UpdateDirectorDto {
+
     @NotNull
-    Long id;
+    private Long id;
     @NullOrNotBlank
-    String name;
+    private String name;
+
 }

@@ -12,7 +12,8 @@ import java.util.Collection;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public final class MpaService {
+public class MpaService {
+
     private final Storage<MPA> storage;
 
     public Collection<MPA> findAll() {
@@ -25,4 +26,5 @@ public final class MpaService {
         return storage.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("MPA {id=%d} not found.", id)));
     }
+
 }

@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.MPA;
 @Repository
 @Primary
 public class MpaDbStorage extends DbStorage<MPA> {
+
     public MpaDbStorage(final JdbcTemplate template, final RowMapper<MPA> mapper) {
         super("mpa", template, mapper);
     }

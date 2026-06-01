@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public final class Genre implements Entity {
+public class Genre implements Entity {
     private Long id;
     private String name;
 }

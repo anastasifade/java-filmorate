@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.dto.director;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 
-@Value
+@Data
 @Builder
 public class ResponseDirectorDto {
-    Long id;
-    String name;
+    private Long id;
+    private String name;
 }

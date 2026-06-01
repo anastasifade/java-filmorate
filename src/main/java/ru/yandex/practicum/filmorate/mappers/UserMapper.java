@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import lombok.experimental.UtilityClass;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.user.NewUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
@@ -8,8 +8,12 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
-@UtilityClass
-public final class UserMapper {
+@Component
+public class UserMapper {
+
+    private UserMapper() {
+    }
+
     public static User toUser(NewUserDto dto) {
         String login = dto.getLogin().trim();
         String name = (dto.getName() == null || dto.getName().isBlank()) ? login : dto.getName().trim();
@@ -47,4 +51,5 @@ public final class UserMapper {
                 .birthday(user.getBirthday())
                 .build();
     }
+
 }

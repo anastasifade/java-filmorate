@@ -13,7 +13,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users/{userId}/friends")
-public final class FriendsController {
+public class FriendsController {
+
     private final UserService userService;
 
     @GetMapping
@@ -43,4 +44,7 @@ public final class FriendsController {
         userService.deleteFriend(userId, friendId);
         log.trace("DELETE /users/{}/friends/{} successful.", userId, friendId);
     }
+
+
+
 }

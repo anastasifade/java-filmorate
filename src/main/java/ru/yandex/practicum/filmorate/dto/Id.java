@@ -10,5 +10,5 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class Id {
     @NotNull
-    Long id;
+    private final Long id;
 }

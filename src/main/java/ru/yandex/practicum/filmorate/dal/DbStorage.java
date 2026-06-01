@@ -20,7 +20,9 @@ import java.util.Optional;
 @Transactional
 @Slf4j
 public abstract class DbStorage<T extends Entity> implements Storage<T> {
+
     protected final String table;
+
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
 
@@ -98,7 +100,9 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
 
     protected void update(String query, Object... params) {
         int rowsUpdated = jdbc.update(query, params);
-        if (rowsUpdated == 0) throw new InternalServerException("Failed to update data.");
+        if (rowsUpdated == 0) {
+            throw new InternalServerException("Failed to update data.");
+        }
     }
 
     protected int[] batchUpdate(String query, BatchPreparedStatementSetter setter) {
@@ -108,12 +112,16 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
     @Override
     public void delete(long id) {
         int rowsDeleted = jdbc.update(getDeleteQuery(), id);
-        if (rowsDeleted == 0) log.debug("No objects deleted.");
+        if (rowsDeleted == 0) {
+            log.debug("No objects deleted.");
+        }
     }
 
     protected void delete(String query, Object... params) {
         int rowsDeleted = jdbc.update(query, params);
-        if (rowsDeleted == 0) log.debug("No objects deleted.");
+        if (rowsDeleted == 0) {
+            log.debug("No objects deleted.");
+        }
     }
 
     protected String getFindAllQuery() {
@@ -127,4 +135,5 @@ public abstract class DbStorage<T extends Entity> implements Storage<T> {
     protected String getDeleteQuery() {
         return String.format("DELETE FROM %s WHERE id = ?;", table);
     }
+
 }

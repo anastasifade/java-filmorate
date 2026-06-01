@@ -16,7 +16,8 @@ import java.util.Collection;
 @RequestMapping("/directors")
 @RestController
 @Slf4j
-public final class DirectorController {
+public class DirectorController {
+
     private final DirectorService service;
 
     @GetMapping
@@ -32,7 +33,6 @@ public final class DirectorController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDirectorDto create(@Valid @RequestBody NewDirectorDto dto) {
         log.info("Handling POST /directors request.");
         log.debug("POST request to create object: {}.", dto);
@@ -56,4 +56,5 @@ public final class DirectorController {
 
         service.delete(id);
     }
+
 }

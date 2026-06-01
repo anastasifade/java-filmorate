@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.dto.event;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 
-@Value
+@Data
 @Builder
 public class EventDto {
-    Long eventId;
-    Long userId;
-    Long entityId;
-    Long timestamp;
-    String eventType;
-    String operation;
+
+    private Long eventId;
+    private Long userId;
+    private Long entityId;
+    private Long timestamp;
+    private String eventType;
+    private String operation;
+
 }

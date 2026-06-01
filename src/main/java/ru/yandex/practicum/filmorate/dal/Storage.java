@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface Storage<T extends Entity> {
+
     Collection<T> findAll();
 
     Optional<T> findById(long id);
@@ -15,4 +16,5 @@ public interface Storage<T extends Entity> {
     T update(T obj);
 
     void delete(long id);
+
 }

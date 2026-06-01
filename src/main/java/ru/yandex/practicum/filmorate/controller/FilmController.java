@@ -11,13 +11,14 @@ import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.Collection;
+import java.util.*;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
-public final class FilmController {
+public class FilmController {
+
     private final FilmService filmService;
 
     @GetMapping

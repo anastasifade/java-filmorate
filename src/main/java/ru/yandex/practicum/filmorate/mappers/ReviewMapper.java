@@ -1,16 +1,20 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import lombok.experimental.UtilityClass;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.review.NewReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.ResponseReviewDto;
 import ru.yandex.practicum.filmorate.dto.review.UpdateReviewDto;
 import ru.yandex.practicum.filmorate.model.Review;
 
-@UtilityClass
-public final class ReviewMapper {
+@Component
+public class ReviewMapper {
+    private ReviewMapper() {
+    }
+
     public static Review toEntity(NewReviewDto request) {
-        if (request == null)
+        if (request == null) {
             return null;
+        }
         return Review.builder()
                 .content(request.getContent())
                 .isPositive(request.getIsPositive())
@@ -21,8 +25,9 @@ public final class ReviewMapper {
     }
 
     public static ResponseReviewDto toDto(Review review) {
-        if (review == null)
+        if (review == null) {
             return null;
+        }
         return ResponseReviewDto.builder()
                 .reviewId(review.getReviewId())
                 .content(review.getContent())
@@ -34,8 +39,9 @@ public final class ReviewMapper {
     }
 
     public static void updateEntity(UpdateReviewDto dto, Review existingReview) {
-        if (dto == null || existingReview == null)
+        if (dto == null || existingReview == null) {
             return;
+        }
         existingReview.setContent(dto.getContent());
         existingReview.setIsPositive(dto.getIsPositive());
     }

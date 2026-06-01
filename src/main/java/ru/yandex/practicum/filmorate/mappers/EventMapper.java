@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import lombok.experimental.UtilityClass;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.event.EventDto;
 import ru.yandex.practicum.filmorate.enums.EventOperation;
 import ru.yandex.practicum.filmorate.enums.EventType;
@@ -8,8 +8,9 @@ import ru.yandex.practicum.filmorate.model.Event;
 
 import java.time.Instant;
 
-@UtilityClass
-public final class EventMapper {
+@Component
+public class EventMapper {
+
     public static EventDto toDto(Event event) {
         return EventDto.builder()
                 .eventId(event.getId())
@@ -30,4 +31,5 @@ public final class EventMapper {
                 .timestamp(Instant.now().toEpochMilli())
                 .build();
     }
+
 }
