@@ -29,12 +29,7 @@ import java.util.*;
 public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
 
     private static final String FIND_ALL = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
+            SELECT f.*,
                    m.name AS mpa_name,
                    g.id AS genre_id,
                    g.name AS genre_name,
@@ -50,12 +45,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             """;
 
     private static final String FIND_BY_ID = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
+            SELECT f.*,
                    m.name AS mpa_name,
                    g.id AS genre_id,
                    g.name AS genre_name,
@@ -78,104 +68,85 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
                         LEFT JOIN films_likes fl ON fl.film_id = f.id
                         GROUP BY f.id
                         ORDER BY likes DESC, f.id
-                        LIMIT ?),
-            sel AS (SELECT f.*,
-                    m.name AS mpa_name,
-                    g.id AS genre_id,
-                    g.name AS genre_name,
-                    d.id AS director_id,
-                    d.name AS director_name,
-                    p.likes AS likes
-                    FROM popular p
-                    LEFT JOIN films AS f ON f.id = p.id
-                    LEFT JOIN films_genres AS fg ON fg.film_id = f.id
-                    LEFT JOIN genres AS g ON g.id = fg.genre_id
-                    LEFT JOIN mpa AS m ON m.id = f.mpa_id
-                    LEFT JOIN films_directors AS fd ON fd.film_id = f.id
-                    LEFT JOIN directors AS d ON d.id = fd.director_id)
-            SELECT *
-            FROM   sel
+                        LIMIT ?)
+            SELECT f.*,
+                   m.name AS mpa_name,
+                   g.id AS genre_id,
+                   g.name AS genre_name,
+                   d.id AS director_id,
+                   d.name AS director_name,
+                   p.likes AS likes
+                   FROM popular p
+                   LEFT JOIN films AS f ON f.id = p.id
+                   LEFT JOIN films_genres AS fg ON fg.film_id = f.id
+                   LEFT JOIN genres AS g ON g.id = fg.genre_id
+                   LEFT JOIN mpa AS m ON m.id = f.mpa_id
+                   LEFT JOIN films_directors AS fd ON fd.film_id = f.id
+                   LEFT JOIN directors AS d ON d.id = fd.director_id
             """;
 
     private static final String FIND_RECOMMENDED_FILMS = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
+            WITH
+            user_likes AS (
+                SELECT film_id
+                FROM films_likes
+                WHERE user_id = ?),
+            similar_user AS (
+                SELECT fl.user_id
+                FROM films_likes fl
+                JOIN user_likes ul ON fl.film_id = ul.film_id
+                WHERE fl.user_id != ?
+                GROUP BY fl.user_id
+                ORDER BY COUNT(fl.film_id) DESC
+                LIMIT 1
+            ),
+            recommended AS (
+                SELECT DISTINCT fl.film_id
+                FROM films_likes fl
+                JOIN similar_user su ON fl.user_id = su.user_id
+                WHERE fl.film_id NOT IN (SELECT film_id FROM user_likes)
+            )
+            SELECT f.*,
                    m.name AS mpa_name,
                    g.id AS genre_id,
                    g.name AS genre_name,
                    d.id AS director_id,
                    d.name AS director_name
-            FROM films AS f
-            LEFT JOIN films_genres AS fg ON fg.film_id = f.id
-            LEFT JOIN genres AS g ON g.id = fg.genre_id
-            LEFT JOIN mpa AS m ON m.id = f.mpa_id
-            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
-            LEFT JOIN directors AS d ON d.id = fd.director_id
-            WHERE f.id IN (
-                SELECT films_likes.film_id
-                FROM films_likes
-                WHERE films_likes.user_id IN (
-                    SELECT max_common_likes.user_id
-                    FROM (
-                        SELECT user_id, COUNT(film_id)
-                        FROM films_likes
-                        WHERE user_id <> ? AND film_id IN (
-                            SELECT film_id
-                            FROM films_likes
-                            WHERE user_id = ?
-                        )
-                        GROUP BY user_id
-                        ORDER BY COUNT(film_id) DESC
-                        LIMIT 1
-                    ) AS max_common_likes
-                )
-            ) AND f.id NOT IN (
-                SELECT films_likes.film_id
-                FROM films_likes
-                WHERE films_likes.user_id = ?
-            )
-            ORDER BY f.id
-            """;
+            FROM films f
+            LEFT JOIN films_genres fg ON fg.film_id = f.id
+            LEFT JOIN genres g ON g.id = fg.genre_id
+            LEFT JOIN mpa m ON m.id = f.mpa_id
+            LEFT JOIN films_directors fd ON fd.film_id = f.id
+            LEFT JOIN directors d ON d.id = fd.director_id
+            JOIN recommended r ON f.id = r.film_id
+            ORDER BY f.id;
+    """;
 
     private static final String FIND_BY_DIRECTOR_SORT_LIKES = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
+            WITH
+            film_likes AS (
+                SELECT film_id, COUNT(user_id) AS likes
+                FROM films_likes
+                GROUP BY film_id)
+            SELECT f.*,
                    m.name AS mpa_name,
-                   g.id AS genre_id,
+                   g.id   AS genre_id,
                    g.name AS genre_name,
-                   d.id AS director_id,
+                   d.id   AS director_id,
                    d.name AS director_name
-            FROM (SELECT films.id AS id,
-                         COUNT(fl.user_id) AS likes
-                  FROM films
-                  LEFT JOIN films_likes AS fl ON fl.film_id = films.id
-                  GROUP BY films.id
-                  ORDER BY likes DESC, films.id) popular
-            LEFT JOIN films AS f ON f.id = popular.id
-            LEFT JOIN films_genres AS fg ON fg.film_id = f.id
-            LEFT JOIN genres AS g ON g.id = fg.genre_id
-            LEFT JOIN mpa AS m ON m.id = f.mpa_id
-            LEFT JOIN films_directors AS fd ON fd.film_id = f.id
-            LEFT JOIN directors AS d ON d.id = fd.director_id
-            WHERE d.id = ?
-            ORDER BY popular.likes DESC, f.id
+            FROM films_directors fd
+            JOIN films f ON f.id = fd.film_id
+            LEFT JOIN film_likes fl ON fl.film_id = f.id
+            LEFT JOIN films_genres fg ON fg.film_id = f.id
+            LEFT JOIN genres g ON g.id = fg.genre_id
+            LEFT JOIN mpa m ON m.id = f.mpa_id
+            LEFT JOIN directors d ON d.id = fd.director_id
+            WHERE fd.director_id = ?
+            ORDER BY COALESCE(fl.likes, 0) DESC, f.id
             """;
 
     private static final String FIND_BY_DIRECTOR_SORT_YEAR = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
+            SELECT f.*,
                    m.name AS mpa_name,
                    g.id AS genre_id,
                    g.name AS genre_name,
@@ -233,12 +204,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
             """;
 
     private static final String FIND_FILMS_BY_PARAMS = """
-            SELECT f.id AS id,
-                   f.name AS name,
-                   f.release_date AS release_date,
-                   f.description AS description,
-                   f.duration AS duration,
-                   f.mpa_id AS mpa_id,
+            SELECT f.*,
                    m.name AS mpa_name,
                    g.id AS genre_id,
                    g.name AS genre_name,
@@ -259,12 +225,10 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
 
     private static final String FIND_COMMON_FILMS = """
             WITH
-            common AS (SELECT film_id
-                       FROM   films_likes
-                       WHERE user_id = ?
-                       AND   film_id IN (SELECT film_id
-                                         FROM films_likes
-                                         WHERE user_id = ?)),
+            common AS (SELECT fl1.film_id
+                       FROM films_likes fl1
+                       JOIN films_likes fl2 ON fl1.film_id = fl2.film_id
+                       WHERE fl1.user_id = ? AND fl2.user_id = ?),
             popular AS (SELECT f.id, COUNT(fl.user_id) AS likes
                         FROM common c
                         LEFT JOIN films f ON f.id = c.film_id
@@ -463,7 +427,7 @@ public class DbFilmStorage extends DbStorage<Film> implements FilmStorage {
     }
 
     public Collection<Film> recommend(Long userId) {
-        return findMany(FIND_RECOMMENDED_FILMS, extractor, userId, userId, userId);
+        return findMany(FIND_RECOMMENDED_FILMS, extractor, userId, userId);
     }
 
     private BatchPreparedStatementSetter getBatchPsSetterForFilmsGenres(Long filmId, List<Genre> genres) {

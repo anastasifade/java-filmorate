@@ -43,25 +43,18 @@ public class DbUserStorage extends DbStorage<User> implements UserStorage {
             """;
 
     private static final String FIND_FRIENDS = """
-            SELECT *
-            FROM users
-            WHERE id IN (
-                SELECT friend_id
-                FROM friends
-                WHERE user_id = ?)
+            SELECT u.*
+            FROM   users u
+            JOIN   friends f ON u.id = f.friend_id
+            WHERE  f.user_id = ?
             """;
 
     private static final String FIND_COMMON_FRIENDS = """
-            SELECT *
-            FROM users
-            WHERE id = (
-                SELECT friend_id
-                FROM friends
-                WHERE user_id = ?
-                INTERSECT
-                SELECT friend_id
-                FROM friends
-                WHERE user_id = ?)
+            SELECT u.*
+            FROM   users u
+            JOIN   friends f1 ON u.id = f1.friend_id
+            JOIN   friends f2 ON u.id = f2.friend_id
+            WHERE  f1.user_id = ? AND f2.user_id = ?
             """;
 
     private static final String ADD_FRIEND = """
