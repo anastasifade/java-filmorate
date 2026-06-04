@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dto.film;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Data;
+import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import ru.yandex.practicum.filmorate.dto.Id;
 import ru.yandex.practicum.filmorate.validation.NullOrNotBlank;
@@ -11,24 +11,20 @@ import ru.yandex.practicum.filmorate.validation.film.ReleaseDateConstraint;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Value
 public class UpdateFilmDto {
-
-    // TODO: add custom validators to rating and genre?
-
     @NotNull(message = "Id must be provided.")
-    private Long id;
+    Long id;
 
     @NullOrNotBlank(message = "Cannot update to blank name.")
-    private String name;
+    String name;
     @ReleaseDateConstraint(message = "Release date cannot be before 1985-12-28.")
-    private LocalDate releaseDate;
+    LocalDate releaseDate;
     @Positive(message = "Duration must be a positive number.")
-    private Integer duration;
+    Integer duration;
     @Length(max = 200, message = "Description length must not exceed 200 characters.")
-    private String description;
-    private Id mpa;
-    private Set<Id> genres;
-
-
+    String description;
+    Id mpa;
+    Set<Id> genres;
+    Set<Id> directors;
 }

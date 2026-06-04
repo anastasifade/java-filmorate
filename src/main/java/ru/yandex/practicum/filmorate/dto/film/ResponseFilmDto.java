@@ -1,21 +1,23 @@
 package ru.yandex.practicum.filmorate.dto.film;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Value
 @Builder
 public class ResponseFilmDto {
-    private Long id;
-    private String name;
-    private LocalDate releaseDate;
-    private int duration;
-    private String description;
-    private Set<Genre> genres;
-    private MPA mpa;
+    Long id;
+    String name;
+    LocalDate releaseDate;
+    int duration;
+    String description;
+    Set<Genre> genres;
+    Set<Director> directors;
+    MPA mpa;
 }

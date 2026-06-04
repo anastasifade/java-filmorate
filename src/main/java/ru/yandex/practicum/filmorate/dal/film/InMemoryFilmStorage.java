@@ -1,33 +1,33 @@
 package ru.yandex.practicum.filmorate.dal.film;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
+import ru.yandex.practicum.filmorate.enums.SearchParam;
+import ru.yandex.practicum.filmorate.enums.SortParam;
+import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Optional;
+import java.util.Set;
 
 @Component
-public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
-
+public final class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmStorage {
     private static final Comparator<Film> FILM_LIKE_COMPARATOR =
             (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();
 
     @Override
-    public Collection<Film> findPopular(int count) {
+    public Collection<Film> findPopular(int count, Long genreId, Integer year) {
         return findAll().stream().sorted(FILM_LIKE_COMPARATOR).limit(count).toList();
     }
 
     @Override
-    public Optional<Film> findBy(String name, LocalDate release, int duration) {
-        return storage.values()
-                .stream()
-                .filter(film -> film.getName().equalsIgnoreCase(name) &&
-                        film.getReleaseDate().equals(release) &&
-                        film.getDuration() == duration)
-                .findFirst();
+    public Collection<Film> findCommonFilms(Long userId, Long friendId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<Film> findByDirectorSorted(Long directorId, SortParam sortBy) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -40,4 +40,13 @@ public class InMemoryFilmStorage extends InMemoryStorage<Film> implements FilmSt
         storage.get(filmId).getLikes().remove(userId);
     }
 
+    @Override
+    public Collection<Film> searchFilmsByParams(String query, Set<SearchParam> searchParams) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Collection<Film> recommend(Long userId) {
+        throw new UnsupportedOperationException();
+    }
 }

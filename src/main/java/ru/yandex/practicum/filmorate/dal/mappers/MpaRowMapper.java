@@ -8,8 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Component
-public class MpaRowMapper implements RowMapper<MPA> {
-
+public final class MpaRowMapper implements RowMapper<MPA> {
     @Override
     public MPA mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new MPA(rs.getLong("id"), rs.getString("name"));

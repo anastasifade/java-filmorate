@@ -12,7 +12,8 @@ import ru.yandex.practicum.filmorate.dal.user.DbUserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -130,7 +131,6 @@ public class UserDbTests {
                 .build();
         friend = userStorage.create(friend);
 
-        // ADD FRIEND TEST
         userStorage.addFriend(user.getId(), friend.getId());
 
         List<User> userFriends = userStorage.getFriends(user.getId()).stream().toList();
@@ -139,8 +139,6 @@ public class UserDbTests {
 
         List<User> friendFriends = userStorage.getFriends(friend.getId()).stream().toList();
         Assertions.assertTrue(friendFriends.isEmpty());
-
-        // DELETE FRIEND TEST
 
         userStorage.deleteFriend(user.getId(), friend.getId());
 

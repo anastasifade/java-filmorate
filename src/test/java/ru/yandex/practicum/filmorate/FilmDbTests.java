@@ -46,7 +46,6 @@ public class FilmDbTests {
                         assertThat(film.get()).hasFieldOrPropertyWithValue("id", 1L));
     }
 
-    // Testing: add like, delete like, find popular
     @Test
     public void findPopularTest() {
         Film newFilm = Film.builder()
@@ -60,14 +59,14 @@ public class FilmDbTests {
 
         filmStorage.addLike(newFilm.getId(), 1L);
 
-        List<Film> films = filmStorage.findPopular(1).stream().toList();
+        List<Film> films = filmStorage.findPopular(1, null, null).stream().toList();
         Assertions.assertFalse(films.isEmpty());
         assertThat(films.getFirst())
                 .hasFieldOrPropertyWithValue("id", newFilm.getId());
 
         filmStorage.deleteLike(newFilm.getId(), 1L);
 
-        films = filmStorage.findPopular(1).stream().toList();
+        films = filmStorage.findPopular(1, null, null).stream().toList();
         Assertions.assertFalse(films.isEmpty());
         assertThat(films.getFirst())
                 .hasFieldOrPropertyWithValue("id", 1L);
@@ -126,6 +125,7 @@ public class FilmDbTests {
 
         film.setName(newName);
         film.setGenres(newGenres);
+        film.setDirectors(null);
 
         film = filmStorage.update(film);
 

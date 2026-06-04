@@ -3,28 +3,26 @@ package ru.yandex.practicum.filmorate.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.Data;
+import lombok.Value;
 import ru.yandex.practicum.filmorate.validation.NullOrNotBlank;
 
 import java.time.LocalDate;
 
-@Data
+@Value
 public class UpdateUserDto {
-
     @NotNull
-    private Long id;
+    Long id;
 
     @NullOrNotBlank
-    private String name;
+    String name;
 
     @NullOrNotBlank
-    private String login;
+    String login;
 
     @NullOrNotBlank
     @Email
-    private String email;
+    String email;
 
     @PastOrPresent
-    private LocalDate birthday;
-
+    LocalDate birthday;
 }

@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.event.EventDto;
+import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserDto;
 import ru.yandex.practicum.filmorate.dto.user.ResponseUserDto;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -16,9 +19,9 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-public class UserController {
-
+public final class UserController {
     private final UserService userService;
+    private final FilmService filmService;
 
     @GetMapping
     public Collection<ResponseUserDto> findAll() {
@@ -30,6 +33,12 @@ public class UserController {
     public ResponseUserDto findById(@PathVariable Long id) {
         log.info("Handling GET /users/{}.", id);
         return userService.findById(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public Collection<EventDto> getFeed(@PathVariable Long id) {
+        log.info("Handling GET /users/{}/feed.", id);
+        return userService.getFeed(id);
     }
 
     @PostMapping
@@ -53,4 +62,15 @@ public class UserController {
         return responseDto;
     }
 
+    @DeleteMapping("/{userId}")
+    public void delete(@PathVariable Long userId) {
+        log.info("Handling DELETE /users/{}.", userId);
+        userService.delete(userId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public Collection<ResponseFilmDto> recommend(@PathVariable Long id) {
+        log.info("Handling GET /users/{}/recommendations.", id);
+        return filmService.recommend(id);
+    }
 }

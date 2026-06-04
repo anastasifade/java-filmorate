@@ -12,12 +12,12 @@ import ru.yandex.practicum.filmorate.exceptions.MalformedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 @RestControllerAdvice("ru.yandex.practicum.filmorate")
-public class ErrorHandler {
-
+public final class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final MethodArgumentNotValidException e) {
@@ -50,7 +50,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(final Throwable e) {
         log.error("Internal server error: {}.", e.getMessage());
-        log.debug("Error details: {}.", e.getStackTrace().toString());
+        log.debug("Error details: {}.", Arrays.toString(e.getStackTrace()));
         return new ErrorResponse(String.format("Unexpected error: %s.", e.getMessage()));
     }
 }

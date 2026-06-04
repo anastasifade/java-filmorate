@@ -1,10 +1,11 @@
 package ru.yandex.practicum.filmorate.mappers;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.yandex.practicum.filmorate.dto.Id;
+import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
@@ -13,12 +14,8 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
+@UtilityClass
 public final class FilmMapper {
-
-    private FilmMapper() {
-    }
-
     public static Film toFilm(NewFilmDto dto) {
         String name = dto.getName().trim();
         String description = dto.getDescription();
@@ -27,6 +24,11 @@ public final class FilmMapper {
         }
 
         Set<Genre> genres = dto.getGenres() == null ? null : toGenres(dto.getGenres());
+        Set<Director> directors = dto.getDirectors() == null ?
+                null : dto.getDirectors()
+                .stream()
+                .map(DirectorMapper::toDirectorFromId)
+                .collect(Collectors.toSet());
 
         return Film.builder()
                 .name(name)
@@ -35,6 +37,7 @@ public final class FilmMapper {
                 .duration(dto.getDuration())
                 .mpa(new MPA(dto.getMpa().getId(), null))
                 .genres(genres)
+                .directors(directors)
                 .build();
     }
 
@@ -44,8 +47,15 @@ public final class FilmMapper {
         LocalDate release = (dto.getReleaseDate() == null) ? film.getReleaseDate() : dto.getReleaseDate();
         int duration = (dto.getDuration() == null) ? film.getDuration() : dto.getDuration();
         MPA mpa = (dto.getMpa() == null) ? film.getMpa() : new MPA(dto.getMpa().getId(), null);
+
         Set<Genre> genres = (dto.getGenres() == null || dto.getGenres().isEmpty()) ?
-                film.getGenres() : toGenres(dto.getGenres());
+                null : toGenres(dto.getGenres());
+
+        Set<Director> directors = (dto.getDirectors() == null || dto.getDirectors().isEmpty()) ?
+                null : dto.getDirectors()
+                .stream()
+                .map(DirectorMapper::toDirectorFromId)
+                .collect(Collectors.toSet());
 
         return Film.builder()
                 .id(dto.getId())
@@ -55,6 +65,7 @@ public final class FilmMapper {
                 .duration(duration)
                 .mpa(mpa)
                 .genres(genres)
+                .directors(directors)
                 .build();
     }
 
@@ -67,6 +78,7 @@ public final class FilmMapper {
                 .description(film.getDescription())
                 .mpa(film.getMpa())
                 .genres(film.getGenres())
+                .directors(film.getDirectors())
                 .build();
     }
 
@@ -75,5 +87,4 @@ public final class FilmMapper {
                 .map(id -> new Genre(id.getId(), null))
                 .collect(Collectors.toSet());
     }
-
 }

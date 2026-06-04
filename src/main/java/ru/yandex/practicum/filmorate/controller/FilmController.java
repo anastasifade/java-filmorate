@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.ResponseFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.enums.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.*;
+import java.util.Collection;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
-public class FilmController {
-
+public final class FilmController {
     private final FilmService filmService;
 
     @GetMapping
@@ -27,9 +27,24 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<ResponseFilmDto> findPopular(@RequestParam(defaultValue = "10") int count) {
-        log.info("Handling GET /films/popular?count={}.", count);
-        return filmService.findPopular(count);
+    public Collection<ResponseFilmDto> findPopular(@RequestParam(defaultValue = "10") int count,
+                                                   @RequestParam(required = false) Long genreId,
+                                                   @RequestParam(required = false) Integer year) {
+        log.info("Handling GET /films/popular");
+        return filmService.findPopular(count, genreId, year);
+    }
+
+    @GetMapping("/director/{id}")
+    public Collection<ResponseFilmDto> findByDirectorSorted(@PathVariable Long id,
+                                                            @RequestParam(defaultValue = "likes") String sortBy) {
+        log.info("Handling GET /films/director/{}?sortBy={}.", id, sortBy);
+
+        try {
+            SortParam sortParam = SortParam.valueOf(sortBy.toUpperCase());
+            return filmService.findByDirectorSorted(id, sortParam);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException("Unsupported query parameter.");
+        }
     }
 
     @GetMapping("/{id}")
@@ -56,5 +71,23 @@ public class FilmController {
         ResponseFilmDto film = filmService.update(dto);
         log.debug("Updated object: {}.", film);
         return film;
+    }
+
+    @GetMapping("/search")
+    public Collection<ResponseFilmDto> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("Handling GET /films/search?query={}&by={}.", query, by);
+        return filmService.searchFilms(query, by);
+    }
+
+    @DeleteMapping("/{filmId}")
+    public void delete(@PathVariable Long filmId) {
+        log.info("Handling DELETE /films/{}.", filmId);
+        filmService.delete(filmId);
+    }
+
+    @GetMapping("/common")
+    public Collection<ResponseFilmDto> findCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        log.info("Handling GET GET /films/common?userId={}&friendId={}.", userId, friendId);
+        return filmService.findCommonFilms(userId, friendId);
     }
 }

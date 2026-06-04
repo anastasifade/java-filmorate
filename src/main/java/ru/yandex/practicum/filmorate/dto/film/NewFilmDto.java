@@ -14,21 +14,19 @@ import java.util.Set;
 
 @Value
 public class NewFilmDto {
-
     @NotBlank(message = "Missing title.")
-    private String name;
+    String name;
     @NotNull(message = "Missing release date.")
     @ReleaseDateConstraint(message = "Release date cannot be before 1985-12-28.")
-    private LocalDate releaseDate;
+    LocalDate releaseDate;
     @Positive(message = "Duration must be a positive number.")
     @NotNull(message = "Missing duration.")
-    private Integer duration;
+    Integer duration;
     @Length(max = 200, message = "Description length cannot exceed 200 characters.")
-    private String description;
+    String description;
     @NotNull
-    private Id mpa;
+    Id mpa;
 
-    private Set<Id> genres;
-
-
+    Set<Id> genres;
+    Set<Id> directors;
 }

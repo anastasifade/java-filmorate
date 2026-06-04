@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.dal.user;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dal.InMemoryStorage;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class InMemoryUserStorage extends InMemoryStorage<User> implements UserStorage {
-
+public final class InMemoryUserStorage extends InMemoryStorage<User> implements UserStorage {
     @Override
     public boolean isLoginOccupied(String login) {
         return storage.values()

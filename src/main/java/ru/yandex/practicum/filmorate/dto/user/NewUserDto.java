@@ -5,24 +5,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Value;
-import ru.yandex.practicum.filmorate.validation.NullOrNotBlank;
 
 import java.time.LocalDate;
 
 @Value
 public class NewUserDto {
-
     @NotNull
     @Email
-    private String email;
+    String email;
 
     @NotBlank
-    private String login;
+    String login;
 
-    @NullOrNotBlank
-    private String name;
+    String name;
 
     @PastOrPresent
-    private LocalDate birthday;
-
+    LocalDate birthday;
 }
